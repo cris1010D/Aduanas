@@ -1,0 +1,120 @@
+services:
+
+  # ----------------------------------------------------------
+  # BASE DE DATOS: PostgreSQL
+  # Puerto: 5433 (externo) -> 5432 (interno)
+  # Ejecuta automaticamente los scripts de init-multi-db
+  # ----------------------------------------------------------
+  postgres:
+    image: postgres:16
+    container_name: aduanas-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-multi-db:/docker-entrypoint-initdb.d
+    networks:
+      - aduanas-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------------
+  # COORDINADOR: Zookeeper
+  # Requerido por Kafka para gestion de clusters
+  # ----------------------------------------------------------
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: aduanas-zookeeper
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - aduanas-network
+    healthcheck:
+      test: ["CMD-SHELL", "cub zk-ready localhost:2181 30 2>/dev/null && echo OK || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 20s
+
+  # ----------------------------------------------------------
+  # BROKER DE MENSAJES: Kafka
+  # Puerto: 9092
+  # PLAINTEXT_HOST -> acceso desde host (localhost:9092)
+  # PLAINTEXT       -> comunicacion interna entre contenedores
+  # ----------------------------------------------------------
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: aduanas-kafka
+    restart: unless-stopped
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 168
+    networks:
+      - aduanas-network
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list 2>/dev/null && echo OK || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  # ----------------------------------------------------------
+  # UI DE KAFKA: Kafka UI (opcional, para monitoreo visual)
+  # Acceso: http://localhost:8080
+  # ----------------------------------------------------------
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: aduanas-kafka-ui
+    restart: unless-stopped
+    depends_on:
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: aduanas-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    networks:
+      - aduanas-network
+
+# ============================================================
+# VOLUMENES PERSISTENTES
+# ============================================================
+volumes:
+  postgres_data:
+    name: aduanas-postgres-data
+
+# ============================================================
+# RED INTERNA DEL ECOSISTEMA
+# ============================================================
+networks:
+  aduanas-network:
+    name: aduanas-network
+    driver: bridge

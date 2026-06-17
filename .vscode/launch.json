@@ -1,0 +1,122 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug Eureka",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/eureka",
+      "mainClass": "cl.triskeledu.eureka.BibliotecaEurekaApplication",
+      "projectName": "cl-triskeledu-eureka",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-auth",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-auth",
+      "mainClass": "cl.triskeledu.auth.BibliotecaAuthApplication",
+      "projectName": "cl-triskeledu-auth",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-proceso",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-proceso",
+      "mainClass": "cl.triskeledu.proceso.BibliotecaProcesoApplication",
+      "projectName": "cl-triskeledu-proceso",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-menores",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-menores",
+      "mainClass": "cl.triskeledu.menores.BibliotecaMenoresApplication",
+      "projectName": "cl-triskeledu-menores",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-reporte",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-reporte",
+      "mainClass": "cl.triskeledu.reporte.BibliotecaReporteApplication",
+      "projectName": "cl-triskeledu-reporte",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-auditoria",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-auditoria",
+      "mainClass": "cl.triskeledu.auditoria.BibliotecaAuditoriaApplication",
+      "projectName": "cl-triskeledu-auditoria",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-sag",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-sag",
+      "mainClass": "cl.triskeledu.sag.BibliotecaSagApplication",
+      "projectName": "cl-triskeledu-sag",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-pdi",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-pdi",
+      "mainClass": "cl.triskeledu.pdi.BibliotecaPdiApplication",
+      "projectName": "cl-triskeledu-pdi",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-notaria",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-notaria",
+      "mainClass": "cl.triskeledu.notaria.BibliotecaNotariaApplication",
+      "projectName": "cl-triskeledu-notaria",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-monitoreo",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-monitoreo",
+      "mainClass": "cl.triskeledu.monitoreo.BibliotecaMonitoreoApplication",
+      "projectName": "cl-triskeledu-monitoreo",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-datos",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-datos",
+      "mainClass": "cl.triskeledu.datos.BibliotecaDatosApplication",
+      "projectName": "cl-triskeledu-datos",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug All Services",
+      "configurations": [
+        "Debug Eureka",
+        "Debug ms-auth",
+        "Debug ms-proceso",
+        "Debug ms-menores",
+        "Debug ms-reporte",
+        "Debug ms-auditoria",
+        "Debug ms-sag",
+        "Debug ms-pdi",
+        "Debug ms-notaria",
+        "Debug ms-monitoreo",
+        "Debug ms-datos"
+      ]
+    }
+  ]
+}
