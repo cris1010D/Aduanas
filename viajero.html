@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Portal Viajero — Aduanas Chile</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"/>
+<style>
+  :root{--navy:#003366;--gold:#c8922a;--light-bg:#f4f6f9}
+  body{background:var(--light-bg);font-family:'Segoe UI',sans-serif}
+  /* ── AUTH PAGE ── */
+  .auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,var(--navy) 0%,#005599 100%);padding:1rem}
+  .auth-card{background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.25);
+    width:100%;max-width:440px;overflow:hidden}
+  .auth-header{background:var(--navy);color:#fff;padding:2rem;text-align:center}
+  .auth-header .logo-icon{font-size:2.5rem;color:var(--gold);margin-bottom:.5rem}
+  .auth-header h1{font-size:1.3rem;font-weight:700;margin:0}
+  .auth-header p{font-size:.8rem;opacity:.7;margin:.3rem 0 0}
+  .auth-tabs{display:flex;border-bottom:2px solid #e9ecef}
+  .auth-tab{flex:1;padding:.8rem;text-align:center;cursor:pointer;font-weight:600;
+    font-size:.9rem;color:#6c757d;border:none;background:none;transition:.2s}
+  .auth-tab.active{color:var(--navy);border-bottom:3px solid var(--navy);margin-bottom:-2px}
+  .auth-body{padding:1.8rem}
+  /* ── PORTAL ── */
+  #portal{display:none;min-height:100vh}
+  .portal-header{background:var(--navy);color:#fff;padding:1rem 1.5rem;
+    display:flex;align-items:center;justify-content:space-between}
+  .portal-header .brand{display:flex;align-items:center;gap:.75rem}
+  .portal-header .brand-icon{font-size:1.6rem;color:var(--gold)}
+  .portal-header .brand-text{font-size:1rem;font-weight:700}
+  .portal-header .brand-sub{font-size:.72rem;opacity:.7}
+  .user-chip{background:rgba(255,255,255,.15);border-radius:20px;
+    padding:.3rem .8rem;font-size:.8rem;display:flex;align-items:center;gap:.4rem}
+  .portal-body{max-width:900px;margin:2rem auto;padding:0 1rem}
+  .welcome-banner{background:var(--navy);color:#fff;border-radius:12px;
+    padding:1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem}
+  .welcome-banner .avatar{width:52px;height:52px;background:var(--gold);
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:1.4rem;font-weight:700;color:var(--navy);flex-shrink:0}
+  .welcome-banner h2{font-size:1.15rem;font-weight:700;margin:0}
+  .welcome-banner p{font-size:.82rem;opacity:.8;margin:.2rem 0 0}
+  .step-card{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);
+    padding:1.4rem;margin-bottom:1rem;border-left:4px solid var(--navy);cursor:pointer;
+    transition:.2s;text-decoration:none;color:inherit;display:block}
+  .step-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.12);color:inherit}
+  .step-card.done{border-left-color:#198754}
+  .step-card.warn{border-left-color:#c8922a}
+  .step-header{display:flex;align-items:center;gap:1rem}
+  .step-icon{width:42px;height:42px;border-radius:10px;background:var(--light-bg);
+    display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+  .step-icon.done{background:#d1e7dd;color:#198754}
+  .step-icon.warn{background:#fff3cd;color:#c8922a}
+  .step-title{font-weight:700;font-size:1rem;margin:0}
+  .step-desc{font-size:.82rem;color:#6c757d;margin:.2rem 0 0}
+  .step-badge{margin-left:auto}
+  /* ── SECTION VIEWS ── */
+  .section-view{display:none}
+  .section-view.active{display:block}
+  .section-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1.2rem}
+  .section-header .back-btn{background:none;border:1px solid #dee2e6;border-radius:8px;
+    padding:.3rem .7rem;font-size:.85rem;color:#495057;cursor:pointer}
+  .section-header .back-btn:hover{background:#f8f9fa}
+  .section-card{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:1.5rem}
+  /* ── UTILITIES ── */
+  .btn-navy{background:var(--navy);color:#fff;border:none}
+  .btn-navy:hover{background:#002244;color:#fff}
+  .btn-gold{background:var(--gold);color:#fff;border:none}
+  .btn-gold:hover{background:#a87420;color:#fff}
+  .form-control:focus,.form-select:focus{border-color:var(--navy);box-shadow:0 0 0 .2rem rgba(0,51,102,.2)}
+  .status-badge{font-size:.75rem;padding:.3rem .6rem;border-radius:20px;font-weight:600}
+</style>
+</head>
+<body>
+
+<!-- ══════════ AUTH PAGE ══════════ -->
+<div id="authPage" class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo-icon"><i class="bi bi-shield-fill-check"></i></div>
+      <h1>Portal del Viajero</h1>
+      <p>Servicio Nacional de Aduanas — Chile</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Iniciar Sesión</button>
+      <button class="auth-tab" onclick="switchTab('registro')">Registrarse</button>
+    </div>
+    <div class="auth-body">
+      <!-- LOGIN -->
+      <div id="tabLogin">
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">RUT</label>
+          <input id="l_rut" class="form-control" placeholder="12345678-9"/>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Contraseña</label>
+          <input id="l_pass" type="password" class="form-control" placeholder="••••••"/>
+        </div>
+        <div id="loginErr" class="alert alert-danger d-none py-2 small"></div>
+        <button class="btn btn-navy w-100 fw-semibold" onclick="doLogin()">
+          <i class="bi bi-box-arrow-in-right me-1"></i>Ingresar
+        </button>
+        <p class="text-center text-muted small mt-3">¿No tienes cuenta? <a href="#" onclick="switchTab('registro')">Regístrate aquí</a></p>
+      </div>
+      <!-- REGISTRO -->
+      <div id="tabRegistro" style="display:none">
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">RUT *</label>
+          <input id="r_rut" class="form-control" placeholder="12345678-9"/>
+          <div id="r_rutErr" class="invalid-feedback"></div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Nombre completo *</label>
+          <input id="r_nombre" class="form-control" placeholder="Juan Pérez"/>
+          <div id="r_nombreErr" class="invalid-feedback"></div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Contraseña * <span class="text-muted">(mín. 6 caracteres)</span></label>
+          <input id="r_pass" type="password" class="form-control" placeholder="••••••"/>
+          <div id="r_passErr" class="invalid-feedback"></div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Confirmar contraseña *</label>
+          <input id="r_pass2" type="password" class="form-control" placeholder="••••••"/>
+          <div id="r_pass2Err" class="invalid-feedback"></div>
+        </div>
+        <div id="registroErr" class="alert alert-danger d-none py-2 small"></div>
+        <button class="btn btn-gold w-100 fw-semibold" onclick="doRegistro()">
+          <i class="bi bi-person-plus me-1"></i>Crear cuenta
+        </button>
+        <p class="text-center text-muted small mt-3">¿Ya tienes cuenta? <a href="#" onclick="switchTab('login')">Inicia sesión</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PORTAL ══════════ -->
+<div id="portal">
+  <div class="portal-header">
+    <div class="brand">
+      <div class="brand-icon"><i class="bi bi-shield-fill-check"></i></div>
+      <div>
+        <div class="brand-text">Portal del Viajero</div>
+        <div class="brand-sub">Servicio Nacional de Aduanas</div>
+      </div>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <div class="user-chip"><i class="bi bi-person-circle"></i><span id="headerNombre">—</span></div>
+      <button class="btn btn-sm btn-outline-light" onclick="doLogout()">
+        <i class="bi bi-box-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="portal-body">
+    <!-- HOME VIEW -->
+    <div id="viewHome" class="section-view active">
+      <div class="welcome-banner">
+        <div class="avatar" id="avatarInit">—</div>
+        <div>
+          <h2 id="welcomeNombre">Bienvenido</h2>
+          <p>Complete los pasos para agilizar su cruce fronterizo</p>
+        </div>
+      </div>
+
+      <!-- Pasos -->
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <div class="step-card" onclick="showSection('perfil')">
+            <div class="step-header">
+              <div class="step-icon" id="iconPerfil"><i class="bi bi-person-vcard"></i></div>
+              <div>
+                <div class="step-title">1. Mis Datos Personales</div>
+                <div class="step-desc">Registre su información de viajero: pasaporte, nacionalidad</div>
+              </div>
+              <span class="step-badge"><i class="bi bi-chevron-right text-muted"></i></span>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="step-card" onclick="showSection('sag')">
+            <div class="step-header">
+              <div class="step-icon" id="iconSag"><i class="bi bi-leaf"></i></div>
+              <div>
+                <div class="step-title">2. Declaración SAG</div>
+                <div class="step-desc">Declare alimentos, plantas o animales que porta</div>
+              </div>
+              <span class="step-badge"><i class="bi bi-chevron-right text-muted"></i></span>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="step-card" onclick="showSection('vehiculo')">
+            <div class="step-header">
+              <div class="step-icon" id="iconVehiculo"><i class="bi bi-truck"></i></div>
+              <div>
+                <div class="step-title">3. Mi Vehículo <span class="text-muted small">(opcional)</span></div>
+                <div class="step-desc">Registre el vehículo con el que ingresa al país</div>
+              </div>
+              <span class="step-badge"><i class="bi bi-chevron-right text-muted"></i></span>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="step-card" onclick="showSection('menores')">
+            <div class="step-header">
+              <div class="step-icon" id="iconMenores"><i class="bi bi-people"></i></div>
+              <div>
+                <div class="step-title">4. Menores de Edad <span class="text-muted small">(opcional)</span></div>
+                <div class="step-desc">Registre los menores que viajan con usted</div>
+              </div>
+              <span class="step-badge"><i class="bi bi-chevron-right text-muted"></i></span>
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="step-card" onclick="showSection('movimientos')">
+            <div class="step-header">
+              <div class="step-icon"><i class="bi bi-clock-history"></i></div>
+              <div>
+                <div class="step-title">Mis Movimientos Fronterizos</div>
+                <div class="step-desc">Consulte su historial de ingresos y egresos</div>
+              </div>
+              <span class="step-badge"><i class="bi bi-chevron-right text-muted"></i></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN: PERFIL -->
+    <div id="viewPerfil" class="section-view">
+      <div class="section-header">
+        <button class="back-btn" onclick="showSection('home')"><i class="bi bi-arrow-left"></i> Volver</button>
+        <h5 class="mb-0"><i class="bi bi-person-vcard me-2"></i>Mis Datos Personales</h5>
+      </div>
+      <div class="section-card">
+        <div id="perfilExistente" class="d-none">
+          <div class="alert alert-success"><i class="bi bi-check-circle me-2"></i>Datos registrados correctamente.</div>
+          <table class="table table-sm">
+            <tbody id="perfilDetalle"></tbody>
+          </table>
+        </div>
+        <div id="perfilForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Nombre *</label>
+              <input id="p_nombre" class="form-control form-control-sm" placeholder="Juan"/>
+              <div id="p_nombreErr" class="invalid-feedback"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Apellido *</label>
+              <input id="p_apellido" class="form-control form-control-sm" placeholder="Pérez"/>
+              <div id="p_apellidoErr" class="invalid-feedback"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Nacionalidad *</label>
+              <input id="p_nacionalidad" class="form-control form-control-sm" placeholder="Chilena"/>
+              <div id="p_nacErr" class="invalid-feedback"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">N° Pasaporte</label>
+              <input id="p_pasaporte" class="form-control form-control-sm" placeholder="AA123456"/>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-navy btn-sm px-4" onclick="guardarPerfil()">
+                <i class="bi bi-check-lg me-1"></i>Guardar datos
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN: SAG -->
+    <div id="viewSag" class="section-view">
+      <div class="section-header">
+        <button class="back-btn" onclick="showSection('home')"><i class="bi bi-arrow-left"></i> Volver</button>
+        <h5 class="mb-0"><i class="bi bi-leaf me-2"></i>Declaración SAG</h5>
+      </div>
+      <div class="section-card mb-3">
+        <p class="text-muted small mb-3">Toda persona que ingrese a Chile debe declarar si porta productos de origen animal o vegetal.</p>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Fecha de ingreso *</label>
+            <input id="sag_fecha" type="date" class="form-control form-control-sm"/>
+            <div id="sag_fechaErr" class="invalid-feedback"></div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Paso fronterizo *</label>
+            <select id="sag_paso" class="form-select form-select-sm">
+              <option value="">Seleccione...</option>
+              <option>Los Libertadores</option>
+              <option>Chacalluta</option>
+              <option>Colchane</option>
+              <option>Pino Hachado</option>
+              <option>Cardenal Samoré</option>
+              <option>San Sebastián</option>
+            </select>
+            <div id="sag_pasoErr" class="invalid-feedback"></div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">¿Porta productos? *</label>
+            <select id="sag_estado" class="form-select form-select-sm">
+              <option value="PENDIENTE">Sin declarar (se revisará en frontera)</option>
+              <option value="APROBADA">Declaro que NO porto productos prohibidos</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <button class="btn btn-navy btn-sm px-4" onclick="guardarSag()">
+              <i class="bi bi-send me-1"></i>Enviar declaración
+            </button>
+          </div>
+        </div>
+      </div>
+      <h6 class="fw-semibold mb-2">Mis declaraciones anteriores</h6>
+      <div class="table-responsive">
+        <table class="table table-sm table-hover bg-white rounded">
+          <thead class="table-light"><tr><th>Fecha</th><th>Paso</th><th>Estado</th></tr></thead>
+          <tbody id="sagHistorial"><tr><td colspan="3" class="text-center text-muted py-3">Cargando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SECCIÓN: VEHÍCULO -->
+    <div id="viewVehiculo" class="section-view">
+      <div class="section-header">
+        <button class="back-btn" onclick="showSection('home')"><i class="bi bi-arrow-left"></i> Volver</button>
+        <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Mi Vehículo</h5>
+      </div>
+      <div class="section-card mb-3">
+        <p class="text-muted small mb-3">Registre el vehículo con el que ingresa temporalmente a Chile (máximo 180 días).</p>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Patente *</label>
+            <input id="v_patente" class="form-control form-control-sm" placeholder="AB1234"/>
+            <div id="v_patenteErr" class="invalid-feedback"></div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Marca *</label>
+            <input id="v_marca" class="form-control form-control-sm" placeholder="Toyota"/>
+            <div id="v_marcaErr" class="invalid-feedback"></div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Modelo *</label>
+            <input id="v_modelo" class="form-control form-control-sm" placeholder="Corolla"/>
+            <div id="v_modeloErr" class="invalid-feedback"></div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Año</label>
+            <input id="v_anio" type="number" class="form-control form-control-sm" placeholder="2020" min="1990" max="2030"/>
+          </div>
+          <div class="col-12">
+            <button class="btn btn-navy btn-sm px-4" onclick="guardarVehiculo()">
+              <i class="bi bi-check-lg me-1"></i>Registrar vehículo
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="vehiculoRegistrado" class="d-none">
+        <div class="alert alert-success"><i class="bi bi-check-circle me-2"></i>Vehículo registrado para admisión temporal (180 días).</div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN: MENORES -->
+    <div id="viewMenores" class="section-view">
+      <div class="section-header">
+        <button class="back-btn" onclick="showSection('home')"><i class="bi bi-arrow-left"></i> Volver</button>
+        <h5 class="mb-0"><i class="bi bi-people me-2"></i>Menores que me acompañan</h5>
+      </div>
+      <div class="section-card mb-3">
+        <p class="text-muted small mb-3">Registre los menores de 18 años que viajan con usted. Deben portar cédula o pasaporte vigente y autorización notarial si corresponde.</p>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">RUT del menor *</label>
+            <input id="m_rut" class="form-control form-control-sm" placeholder="12345678-9"/>
+            <div id="m_rutErr" class="invalid-feedback"></div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Nombre completo *</label>
+            <input id="m_nombre" class="form-control form-control-sm" placeholder="Nombre"/>
+            <div id="m_nombreErr" class="invalid-feedback"></div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Fecha de nacimiento *</label>
+            <input id="m_fechaNac" type="date" class="form-control form-control-sm"/>
+            <div id="m_fechaErr" class="invalid-feedback"></div>
+          </div>
+          <div class="col-12">
+            <button class="btn btn-navy btn-sm px-4" onclick="guardarMenor()">
+              <i class="bi bi-person-plus me-1"></i>Agregar menor
+            </button>
+          </div>
+        </div>
+      </div>
+      <h6 class="fw-semibold mb-2">Menores registrados</h6>
+      <div class="table-responsive">
+        <table class="table table-sm table-hover bg-white rounded">
+          <thead class="table-light"><tr><th>RUT</th><th>Nombre</th><th>Fecha Nac.</th></tr></thead>
+          <tbody id="menoresLista"><tr><td colspan="3" class="text-center text-muted py-3">Sin menores registrados</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SECCIÓN: MOVIMIENTOS -->
+    <div id="viewMovimientos" class="section-view">
+      <div class="section-header">
+        <button class="back-btn" onclick="showSection('home')"><i class="bi bi-arrow-left"></i> Volver</button>
+        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Mis Movimientos</h5>
+      </div>
+      <div class="section-card">
+        <div class="table-responsive">
+          <table class="table table-sm table-hover">
+            <thead class="table-light"><tr><th>#</th><th>Tipo</th><th>Fecha</th><th>Paso Fronterizo</th></tr></thead>
+            <tbody id="movLista"><tr><td colspan="4" class="text-center text-muted py-3">Cargando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /portal-body -->
+</div><!-- /portal -->
+
+<!-- TOAST -->
+<div id="toastCont" style="position:fixed;top:1rem;right:1rem;z-index:9999;min-width:260px"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script>
+const API = 'http://localhost:9000';
+let token = sessionStorage.getItem('viajero_token') || null;
+let me = token ? decodeJwt(token) : null;
+
+// ── Si ya hay sesión activa, ir directo al portal ──────────────────────
+if (token && me && me.rol === 'VIAJERO') bootPortal();
+
+// ══════════════════════════════════════════════════════════
+//  AUTH
+// ══════════════════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tabLogin').style.display    = tab === 'login'    ? '' : 'none';
+  document.getElementById('tabRegistro').style.display = tab === 'registro' ? '' : 'none';
+  document.querySelectorAll('.auth-tab')[tab === 'login' ? 0 : 1].classList.add('active');
+}
+
+async function doLogin() {
+  const rut  = document.getElementById('l_rut').value.trim();
+  const pass = document.getElementById('l_pass').value.trim();
+  const err  = document.getElementById('loginErr');
+  err.classList.add('d-none');
+  if (!rut || !pass) { err.textContent = 'Complete RUT y contraseña.'; err.classList.remove('d-none'); return; }
+  try {
+    const r = await fetch(`${API}/api/v1/auth/login`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({username: rut, password: pass})
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error('Credenciales incorrectas');
+    token = data.token;
+    me = decodeJwt(token);
+    if (me.rol !== 'VIAJERO') throw new Error('Esta cuenta no es de viajero. Use el dashboard de funcionarios.');
+    sessionStorage.setItem('viajero_token', token);
+    bootPortal();
+  } catch(e) { err.textContent = '⚠ ' + e.message; err.classList.remove('d-none'); }
+}
+
+async function doRegistro() {
+  const rut   = document.getElementById('r_rut').value.trim();
+  const nombre= document.getElementById('r_nombre').value.trim();
+  const pass  = document.getElementById('r_pass').value.trim();
+  const pass2 = document.getElementById('r_pass2').value.trim();
+  const err   = document.getElementById('registroErr');
+  err.classList.add('d-none');
+
+  // Limpiar errores
+  ['r_rut','r_nombre','r_pass','r_pass2'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('is-invalid');
+  });
+
+  let ok = true;
+  if (!rut)    { markInvalid('r_rut',   'r_rutErr',   'Requerido'); ok=false; }
+  if (!nombre) { markInvalid('r_nombre','r_nombreErr','Requerido'); ok=false; }
+  if (pass.length < 6) { markInvalid('r_pass','r_passErr','Mínimo 6 caracteres'); ok=false; }
+  if (pass !== pass2)  { markInvalid('r_pass2','r_pass2Err','Las contraseñas no coinciden'); ok=false; }
+  if (!ok) return;
+
+  try {
+    const r = await fetch(`${API}/api/v1/auth/registro`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({rut, nombre, password: pass, confirmPassword: pass2})
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.message || 'Error al registrarse');
+    token = data.token;
+    me = decodeJwt(token);
+    sessionStorage.setItem('viajero_token', token);
+    toast('¡Cuenta creada! Bienvenido/a ' + data.nombre, 'success');
+    bootPortal();
+  } catch(e) { err.textContent = '⚠ ' + e.message; err.classList.remove('d-none'); }
+}
+
+function markInvalid(inputId, errId, msg) {
+  const el = document.getElementById(inputId);
+  const er = document.getElementById(errId);
+  el.classList.add('is-invalid');
+  if (er) er.textContent = msg;
+}
+
+function decodeJwt(t) {
+  try { return JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); }
+  catch { return {}; }
+}
+
+// ══════════════════════════════════════════════════════════
+//  PORTAL BOOT
+// ══════════════════════════════════════════════════════════
+function bootPortal() {
+  document.getElementById('authPage').style.display = 'none';
+  document.getElementById('portal').style.display   = 'block';
+  const nombre = me.nombre || me.sub || 'Viajero';
+  document.getElementById('headerNombre').textContent = nombre;
+  document.getElementById('welcomeNombre').textContent = 'Bienvenido/a, ' + nombre;
+  const init = nombre.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('avatarInit').textContent = init;
+  showSection('home');
+  // Auto-cargar el historial SAG y movimientos en background
+  cargarSagHistorial();
+  cargarMovimientos();
+  cargarMenores();
+}
+
+function doLogout() {
+  sessionStorage.removeItem('viajero_token');
+  token = null; me = null;
+  location.reload();
+}
+
+// ══════════════════════════════════════════════════════════
+//  NAVEGACIÓN
+// ══════════════════════════════════════════════════════════
+function showSection(name) {
+  document.querySelectorAll('.section-view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active');
+  if (name === 'sag')        cargarSagHistorial();
+  if (name === 'movimientos') cargarMovimientos();
+  if (name === 'menores')    cargarMenores();
+}
+
+// ══════════════════════════════════════════════════════════
+//  API HELPER
+// ══════════════════════════════════════════════════════════
+async function api(method, path, body) {
+  const opts = { method, headers: {'Authorization':'Bearer '+token,'Content-Type':'application/json'} };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API + path, opts);
+  const text = await r.text();
+  let data; try { data = JSON.parse(text); } catch { data = text; }
+  if (!r.ok) throw new Error((data && (data.message || data.error)) || `Error ${r.status}`);
+  return data;
+}
+
+function extractList(data, key) {
+  if (Array.isArray(data)) return data;
+  if (data._embedded) return data._embedded[Object.keys(data._embedded)[0]] || [];
+  if (data.content) return data.content;
+  if (data[key]) return data[key];
+  return [];
+}
+
+// ══════════════════════════════════════════════════════════
+//  PERFIL
+// ══════════════════════════════════════════════════════════
+async function guardarPerfil() {
+  const nombre     = document.getElementById('p_nombre').value.trim();
+  const apellido   = document.getElementById('p_apellido').value.trim();
+  const nacionalidad = document.getElementById('p_nacionalidad').value.trim();
+  const pasaporte  = document.getElementById('p_pasaporte').value.trim();
+
+  let ok = true;
+  if (!nombre)      { markInvalid('p_nombre','p_nombreErr','Requerido'); ok=false; }
+  if (!apellido)    { markInvalid('p_apellido','p_apellidoErr','Requerido'); ok=false; }
+  if (!nacionalidad){ markInvalid('p_nacionalidad','p_nacErr','Requerido'); ok=false; }
+  if (!ok) return;
+
+  try {
+    await api('POST', '/api/v1/viajeros', {
+      rut: me.sub, nombre, apellido, nacionalidad,
+      pasaporte: pasaporte || null
+    });
+    toast('Datos registrados correctamente', 'success');
+    document.getElementById('iconPerfil').innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>';
+    document.getElementById('perfilForm').style.display = 'none';
+    document.getElementById('perfilExistente').classList.remove('d-none');
+    document.getElementById('perfilDetalle').innerHTML = `
+      <tr><th>RUT</th><td>${me.sub}</td></tr>
+      <tr><th>Nombre</th><td>${nombre} ${apellido}</td></tr>
+      <tr><th>Nacionalidad</th><td>${nacionalidad}</td></tr>
+      ${pasaporte ? `<tr><th>Pasaporte</th><td>${pasaporte}</td></tr>` : ''}
+    `;
+  } catch(e) { toast(e.message, 'danger'); }
+}
+
+// ══════════════════════════════════════════════════════════
+//  SAG
+// ══════════════════════════════════════════════════════════
+async function guardarSag() {
+  const fecha = document.getElementById('sag_fecha').value;
+  const paso  = document.getElementById('sag_paso').value;
+  let ok = true;
+  if (!fecha) { markInvalid('sag_fecha','sag_fechaErr','Requerido'); ok=false; }
+  if (!paso)  { markInvalid('sag_paso','sag_pasoErr','Seleccione un paso'); ok=false; }
+  if (!ok) return;
+  try {
+    await api('POST', '/api/v1/declaraciones', {
+      rutViajero: me.sub, fecha,
+      estado: document.getElementById('sag_estado').value,
+      pasoFronterizo: paso
+    });
+    toast('Declaración SAG enviada', 'success');
+    document.getElementById('iconSag').innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>';
+    document.getElementById('sag_fecha').value = '';
+    document.getElementById('sag_paso').value  = '';
+    cargarSagHistorial();
+  } catch(e) { toast(e.message, 'danger'); }
+}
+
+async function cargarSagHistorial() {
+  const tbody = document.getElementById('sagHistorial');
+  try {
+    const data = await api('GET', '/api/v1/declaraciones');
+    const list = extractList(data, 'declaracionList').filter(d => d.rutViajero === me.sub);
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-2">Sin declaraciones</td></tr>'; return; }
+    const badge = e => e==='APROBADA'?'bg-success':e==='RECHAZADA'?'bg-danger':'bg-warning text-dark';
+    tbody.innerHTML = list.map(d => `
+      <tr>
+        <td>${d.fecha||'—'}</td>
+        <td>${d.pasoFronterizo||'—'}</td>
+        <td><span class="badge ${badge(d.estado)}">${d.estado||'—'}</span></td>
+      </tr>`).join('');
+  } catch(e) { tbody.innerHTML = `<tr><td colspan="3" class="text-danger small py-2">${e.message}</td></tr>`; }
+}
+
+// ══════════════════════════════════════════════════════════
+//  VEHÍCULO
+// ══════════════════════════════════════════════════════════
+async function guardarVehiculo() {
+  const patente = document.getElementById('v_patente').value.trim();
+  const marca   = document.getElementById('v_marca').value.trim();
+  const modelo  = document.getElementById('v_modelo').value.trim();
+  const anio    = document.getElementById('v_anio').value;
+  let ok = true;
+  if (!patente) { markInvalid('v_patente','v_patenteErr','Requerido'); ok=false; }
+  if (!marca)   { markInvalid('v_marca','v_marcaErr','Requerido'); ok=false; }
+  if (!modelo)  { markInvalid('v_modelo','v_modeloErr','Requerido'); ok=false; }
+  if (!ok) return;
+  try {
+    await api('POST', '/api/v1/vehiculos', {
+      patente, marca, modelo,
+      anio: anio ? parseInt(anio) : null,
+      rutViajero: me.sub
+    });
+    toast('Vehículo registrado (admisión temporal 180 días)', 'success');
+    document.getElementById('iconVehiculo').innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>';
+    document.getElementById('vehiculoRegistrado').classList.remove('d-none');
+  } catch(e) { toast(e.message, 'danger'); }
+}
+
+// ══════════════════════════════════════════════════════════
+//  MENORES
+// ══════════════════════════════════════════════════════════
+async function guardarMenor() {
+  const rut     = document.getElementById('m_rut').value.trim();
+  const nombre  = document.getElementById('m_nombre').value.trim();
+  const fechaNac= document.getElementById('m_fechaNac').value;
+  let ok = true;
+  if (!rut)     { markInvalid('m_rut','m_rutErr','Requerido'); ok=false; }
+  if (!nombre)  { markInvalid('m_nombre','m_nombreErr','Requerido'); ok=false; }
+  if (!fechaNac){ markInvalid('m_fechaNac','m_fechaErr','Requerido'); ok=false; }
+  if (!ok) return;
+  try {
+    await api('POST', '/api/v1/menores', {
+      rut, nombre, fechaNac, rutTutor: me.sub
+    });
+    toast('Menor registrado correctamente', 'success');
+    document.getElementById('m_rut').value = '';
+    document.getElementById('m_nombre').value = '';
+    document.getElementById('m_fechaNac').value = '';
+    document.getElementById('iconMenores').innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>';
+    cargarMenores();
+  } catch(e) { toast(e.message, 'danger'); }
+}
+
+async function cargarMenores() {
+  const tbody = document.getElementById('menoresLista');
+  try {
+    const data = await api('GET', '/api/v1/menores');
+    const list = extractList(data, 'menorList').filter(m => m.rutTutor === me.sub);
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-2">Sin menores registrados</td></tr>'; return; }
+    tbody.innerHTML = list.map(m => `
+      <tr>
+        <td><code>${m.rut||'—'}</code></td>
+        <td>${m.nombre||'—'}</td>
+        <td>${m.fechaNac||'—'}</td>
+      </tr>`).join('');
+  } catch(e) { tbody.innerHTML = `<tr><td colspan="3" class="text-danger small py-2">${e.message}</td></tr>`; }
+}
+
+// ══════════════════════════════════════════════════════════
+//  MOVIMIENTOS
+// ══════════════════════════════════════════════════════════
+async function cargarMovimientos() {
+  const tbody = document.getElementById('movLista');
+  try {
+    const data = await api('GET', '/api/v1/movimientos');
+    const list = extractList(data, 'movimientoList').filter(m => m.rutViajero === me.sub);
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-2">Sin movimientos registrados</td></tr>'; return; }
+    tbody.innerHTML = list.map(m => `
+      <tr>
+        <td><span class="badge bg-secondary">#${m.id}</span></td>
+        <td><span class="badge ${m.tipo==='ENTRADA'?'bg-success':'bg-primary'}">${m.tipo||'—'}</span></td>
+        <td>${m.fecha||'—'}</td>
+        <td>${m.pasoFronterizo||'—'}</td>
+      </tr>`).join('');
+  } catch(e) { tbody.innerHTML = `<tr><td colspan="4" class="text-danger small py-2">${e.message}</td></tr>`; }
+}
+
+// ══════════════════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════════════════
+function toast(msg, type='success') {
+  const colors = {success:'bg-success',danger:'bg-danger',warning:'bg-warning text-dark'};
+  const id = 'tv_' + Date.now();
+  document.getElementById('toastCont').insertAdjacentHTML('beforeend', `
+    <div id="${id}" class="toast align-items-center text-white ${colors[type]||'bg-secondary'} border-0 mb-2"
+         role="alert" data-bs-delay="3500">
+      <div class="d-flex">
+        <div class="toast-body fw-semibold">${msg}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>`);
+  const el = document.getElementById(id);
+  new bootstrap.Toast(el).show();
+  el.addEventListener('hidden.bs.toast', () => el.remove());
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+server:
+  port: 9005
+  error:
+    include-stacktrace: never
+
+spring:
+  application:
+    name: ms-auditoria
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/auditoria
+    username: postgres
+    password: 123
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    open-in-view: false
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: ${spring.application.name}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        "[spring.json.trusted.packages]": "cl.triskeledu.*"
+        "[spring.json.type.mapping]": "logEventoCreated:cl.triskeledu.common.event.LogEventoCreatedEvent"
+
+# Bloque de Seguridad Criptográfica Agregado para el Ecosistema
+jwt:
+  secret: "dG9rZW5TZWNyZXRLZXlBZHVhbmFzMjAyNlRyaXNrZWxlZHVTZWN1cml0eUZyb250ZXJpem8="
+  expiration-ms: 3600000
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: "${spring.application.name}:${random.value}"
+    lease-renewal-interval-in-seconds: 15
+    lease-expiration-duration-in-seconds: 60
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: ms-auditoria
+    version: 0.0.1
+    description: Microservicio de Logs Inmutables de Movimientos Fronterizos - Aduanas

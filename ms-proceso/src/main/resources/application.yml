@@ -1,0 +1,85 @@
+server:
+  port: 9002
+  forward-headers-strategy: framework
+  error:
+    include-stacktrace: never
+
+spring:
+  application:
+    name: ms-proceso
+  autoconfigure:
+    exclude:
+      - org.springdoc.core.configuration.SpringDocHateoasConfiguration
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/proceso
+    username: postgres
+    password: 123
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    open-in-view: false
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: ${spring.application.name}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        "[spring.json.trusted.packages]": "cl.triskeledu.*"
+        "[spring.json.type.mapping]": "viajeroCreated:cl.triskeledu.common.event.ViajeroCreatedEvent"
+
+# Bloque de Seguridad Criptográfica Agregado para el Ecosistema
+jwt:
+  secret: "dG9rZW5TZWNyZXRLZXlBZHVhbmFzMjAyNlRyaXNrZWxlZHVTZWN1cml0eUZyb250ZXJpem8="
+  expiration-ms: 3600000
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: "${spring.application.name}:${random.value}"
+    lease-renewal-interval-in-seconds: 15
+    lease-expiration-duration-in-seconds: 60
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: ms-proceso
+    version: 0.0.1
+    description: Microservicio de Orquestacion de Flujos Fronterizos - Aduanas
+
+# --- ISO 25010: timeout Feign por microservicio ---
+feign:
+  client:
+    config:
+      ms-pdi:
+        connectTimeout: 1000   # ms — tiempo maximo para establecer conexion TCP
+        readTimeout: 2000      # ms — tiempo maximo de espera por la respuesta HTTP
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Control Fronterizo - Aduanas Chile</title>
+
+  <!-- Bootstrap 5 -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <!-- Bootstrap Icons -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* ── Variables institucionales ───────────────────────────── */
+    :root {
+      --azul-institucional : #003366;
+      --azul-claro         : #004c99;
+      --azul-hover         : #002244;
+      --blanco             : #ffffff;
+      --gris-fondo         : #f8f9fa;
+      --gris-borde         : #dee2e6;
+      --texto-muted        : #6c757d;
+    }
+
+    /* ── Layout general ──────────────────────────────────────── */
+    body {
+      background-color: var(--gris-fondo);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    /* ── Header institucional ────────────────────────────────── */
+    .header-institucional {
+      background-color: var(--azul-institucional);
+      color: var(--blanco);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .header-institucional .escudo {
+      width: 48px;
+      height: 48px;
+      background: var(--blanco);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .header-institucional .escudo i {
+      font-size: 26px;
+      color: var(--azul-institucional);
+    }
+
+    .header-institucional .titulo-sistema {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      line-height: 1.2;
+    }
+
+    .header-institucional .subtitulo-sistema {
+      font-size: 0.75rem;
+      opacity: 0.85;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* ── Contenido central ───────────────────────────────────── */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    /* ── Tarjeta de login ────────────────────────────────────── */
+    .card-login {
+      width: 100%;
+      max-width: 420px;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 51, 102, 0.15);
+      background: var(--blanco);
+      overflow: hidden;
+    }
+
+    .card-login .card-header-login {
+      background-color: var(--azul-institucional);
+      color: var(--blanco);
+      text-align: center;
+      padding: 28px 24px 20px;
+    }
+
+    .card-login .card-header-login .icono-login {
+      width: 64px;
+      height: 64px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .card-login .card-header-login .icono-login i {
+      font-size: 30px;
+      color: var(--blanco);
+    }
+
+    .card-login .card-header-login h5 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0 0 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .card-login .card-header-login p {
+      font-size: 0.78rem;
+      opacity: 0.8;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .card-login .card-body {
+      padding: 28px 32px;
+      background: var(--blanco);
+    }
+
+    /* ── Formulario ──────────────────────────────────────────── */
+    .form-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--azul-institucional);
+      margin-bottom: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .form-control {
+      border-color: var(--gris-borde);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      padding: 10px 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-control:focus {
+      border-color: var(--azul-claro);
+      box-shadow: 0 0 0 3px rgba(0, 76, 153, 0.15);
+    }
+
+    .input-group .form-control {
+      border-right: none;
+    }
+
+    .input-group .btn-toggle-pass {
+      border: 1px solid var(--gris-borde);
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+      background: var(--blanco);
+      color: var(--texto-muted);
+      padding: 0 14px;
+      transition: color 0.2s;
+    }
+
+    .input-group .btn-toggle-pass:hover {
+      color: var(--azul-institucional);
+    }
+
+    /* ── Botón primario ──────────────────────────────────────── */
+    .btn-institucional {
+      background-color: var(--azul-institucional);
+      color: var(--blanco);
+      border: none;
+      border-radius: 8px;
+      padding: 11px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      width: 100%;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .btn-institucional:hover {
+      background-color: var(--azul-hover);
+      color: var(--blanco);
+      transform: translateY(-1px);
+    }
+
+    .btn-institucional:active {
+      transform: translateY(0);
+    }
+
+    .btn-institucional:disabled {
+      opacity: 0.65;
+      transform: none;
+      cursor: not-allowed;
+    }
+
+    /* ── Spinner dentro del botón ────────────────────────────── */
+    .btn-institucional .spinner-border {
+      width: 1rem;
+      height: 1rem;
+      border-width: 2px;
+      margin-right: 8px;
+    }
+
+    /* ── Zona de alertas ─────────────────────────────────────── */
+    #zona-alertas {
+      min-height: 0;
+      transition: min-height 0.2s;
+    }
+
+    .alerta-custom {
+      border-radius: 8px;
+      font-size: 0.85rem;
+      padding: 10px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      border: none;
+    }
+
+    .alerta-custom i {
+      font-size: 1rem;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    .alerta-custom.alerta-exito {
+      background-color: #d1f0e0;
+      color: #0b5e2e;
+    }
+
+    .alerta-custom.alerta-error {
+      background-color: #fde8e8;
+      color: #7b1111;
+    }
+
+    .alerta-custom.alerta-info {
+      background-color: #dceeff;
+      color: #0a3464;
+    }
+
+    /* ── Footer ──────────────────────────────────────────────── */
+    footer {
+      background-color: var(--azul-institucional);
+      color: rgba(255, 255, 255, 0.65);
+      text-align: center;
+      font-size: 0.72rem;
+      padding: 10px;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── Divisor ─────────────────────────────────────────────── */
+    .divisor-texto {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--texto-muted);
+      font-size: 0.75rem;
+      margin: 4px 0;
+    }
+    .divisor-texto::before,
+    .divisor-texto::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gris-borde);
+    }
+
+    /* ── RUT helper ──────────────────────────────────────────── */
+    .form-text {
+      font-size: 0.75rem;
+      color: var(--texto-muted);
+    }
+
+    /* ── Responsive ──────────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .card-login .card-body {
+        padding: 24px 20px;
+      }
+      .header-institucional .titulo-sistema {
+        font-size: 0.88rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ Header institucional ══════════════════════════════════════════ -->
+  <header class="header-institucional">
+    <div class="escudo">
+      <i class="bi bi-shield-fill-check"></i>
+    </div>
+    <div>
+      <div class="titulo-sistema">Servicio Nacional de Aduanas de Chile</div>
+      <div class="subtitulo-sistema">Sistema de Control Fronterizo</div>
+    </div>
+  </header>
+
+  <!-- ══ Contenido principal ═══════════════════════════════════════════ -->
+  <main class="main-wrapper">
+    <div class="card-login">
+
+      <!-- Cabecera de la tarjeta -->
+      <div class="card-header-login">
+        <div class="icono-login">
+          <i class="bi bi-person-badge-fill"></i>
+        </div>
+        <h5>Acceso Oficial</h5>
+        <p>Autenticación de funcionarios</p>
+      </div>
+
+      <!-- Cuerpo: formulario + alertas -->
+      <div class="card-body">
+
+        <!-- ── Zona de alertas ── -->
+        <div id="zona-alertas" class="mb-3"></div>
+
+        <!-- ── Formulario de login ── -->
+        <form id="form-login" novalidate>
+
+          <!-- Campo RUT -->
+          <div class="mb-3">
+            <label for="rut" class="form-label">
+              <i class="bi bi-person-vcard me-1"></i>RUT Oficial
+            </label>
+            <input
+              type="text"
+              id="rut"
+              name="rut"
+              class="form-control"
+              placeholder="Ej: 12345678-9"
+              maxlength="12"
+              autocomplete="username"
+              required
+            />
+            <div class="form-text">Ingrese su RUT sin puntos y con guion.</div>
+          </div>
+
+          <!-- Campo Contraseña -->
+          <div class="mb-4">
+            <label for="password" class="form-label">
+              <i class="bi bi-lock-fill me-1"></i>Contraseña
+            </label>
+            <div class="input-group">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-control"
+                placeholder="Ingrese su contraseña"
+                autocomplete="current-password"
+                required
+              />
+              <button
+                type="button"
+                class="btn-toggle-pass"
+                id="btn-toggle-pass"
+                tabindex="-1"
+                title="Mostrar / ocultar contraseña"
+              >
+                <i class="bi bi-eye" id="icono-pass"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Botón submit -->
+          <button type="submit" class="btn-institucional" id="btn-ingresar">
+            <span id="texto-btn">
+              <i class="bi bi-box-arrow-in-right me-2"></i>Ingresar al Sistema
+            </span>
+            <span id="spinner-btn" class="d-none">
+              <span class="spinner-border" role="status" aria-hidden="true"></span>
+              Verificando...
+            </span>
+          </button>
+
+        </form>
+
+        <!-- ── Divisor ── -->
+        <div class="divisor-texto mt-4">uso exclusivo de funcionarios autorizados</div>
+
+        <!-- ── Información de seguridad ── -->
+        <div class="text-center mt-3">
+          <small class="text-muted">
+            <i class="bi bi-shield-lock me-1"></i>
+            Conexión segura &nbsp;|&nbsp;
+            <i class="bi bi-clock me-1"></i>
+            Sesión: 60 min
+          </small>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ══ Footer ════════════════════════════════════════════════════════ -->
+  <footer>
+    Servicio Nacional de Aduanas de Chile &nbsp;·&nbsp;
+    Sistema de Control Fronterizo v1.0 &nbsp;·&nbsp;
+    Uso interno &mdash; acceso restringido
+  </footer>
+
+  <!-- ══ Bootstrap 5 JS ════════════════════════════════════════════════ -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ════════════════════════════════════════════════════════════════════
+    //  Autenticación JWT Stateless — conexión al API Gateway (puerto 9000)
+    //
+    //  Flujo:
+    //    1. POST /api/v1/auth/login → recibe { token, username, rol, ... }
+    //    2. Persiste token en localStorage (sobrevive al cierre de pestaña)
+    //    3. Login OK  → mensaje de bienvenida con nombre y rol + redirect
+    //    4. Error 401 → credenciales incorrectas (GlobalExceptionHandler)
+    //    5. Error 403 → cuenta sin permisos (GlobalExceptionHandler)
+    //    6. Sin red   → mensaje de conexión rechazada
+    // ════════════════════════════════════════════════════════════════════
+
+    // ── Constante del Gateway ────────────────────────────────────────────
+    const GATEWAY_URL    = 'http://localhost:9000';
+    const LOGIN_ENDPOINT = `${GATEWAY_URL}/api/v1/auth/login`;
+
+    // Claves que ms-auth puede devolver para el JWT (cualquiera de las tres)
+    const TOKEN_KEYS = ['token', 'accessToken', 'jwt'];
+
+    // ── Referencias DOM ──────────────────────────────────────────────────
+    const formLogin     = document.getElementById('form-login');
+    const inputRut      = document.getElementById('rut');
+    const inputPassword = document.getElementById('password');
+    const btnIngresar   = document.getElementById('btn-ingresar');
+    const textoBtnEl    = document.getElementById('texto-btn');
+    const spinnerBtnEl  = document.getElementById('spinner-btn');
+    const zonaAlertas   = document.getElementById('zona-alertas');
+    const btnTogglePass = document.getElementById('btn-toggle-pass');
+    const iconoPass     = document.getElementById('icono-pass');
+
+    // ── Si ya hay sesión activa, redirigir directo ───────────────────────
+    if (localStorage.getItem('jwt_token')) {
+      window.location.href = './dashboard.html';
+    }
+
+    // ── Toggle mostrar/ocultar contraseña ────────────────────────────────
+    btnTogglePass.addEventListener('click', () => {
+      const visible = inputPassword.type === 'text';
+      inputPassword.type      = visible ? 'password' : 'text';
+      iconoPass.className     = visible ? 'bi bi-eye' : 'bi bi-eye-slash';
+    });
+
+    // ── Formateo RUT en tiempo real (sin puntos, con guion) ─────────────
+    inputRut.addEventListener('input', (e) => {
+      let val = e.target.value.replace(/[^0-9kK]/g, '');
+      if (val.length > 1) {
+        const cuerpo = val.slice(0, -1);
+        const dv     = val.slice(-1).toUpperCase();
+        val = cuerpo + '-' + dv;
+      }
+      e.target.value = val;
+    });
+
+    // ── Helpers de alerta ────────────────────────────────────────────────
+    function mostrarAlerta(tipo, icono, html) {
+      zonaAlertas.innerHTML = `
+        <div class="alerta-custom alerta-${tipo}">
+          <i class="bi bi-${icono}"></i>
+          <span>${html}</span>
+        </div>`;
+    }
+
+    function limpiarAlertas() {
+      zonaAlertas.innerHTML = '';
+    }
+
+    // ── Estado del botón de ingreso ──────────────────────────────────────
+    function setCargando(cargando) {
+      btnIngresar.disabled = cargando;
+      textoBtnEl.classList.toggle('d-none',  cargando);
+      spinnerBtnEl.classList.toggle('d-none', !cargando);
+    }
+
+    // ── Validación de formato RUT ────────────────────────────────────────
+    function validarRut(rut) {
+      return /^[0-9]{6,8}-[0-9kK]$/.test(rut);
+    }
+
+    // ── Decodifica el payload del JWT (Base64URL) sin librería externa ───
+    function decodificarJwt(token) {
+      try {
+        const payload = token.split('.')[1];
+        const json    = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+        return JSON.parse(json);
+      } catch {
+        return {};
+      }
+    }
+
+    // ── Extrae el campo token de la respuesta del backend ────────────────
+    function extraerToken(data) {
+      for (const key of TOKEN_KEYS) {
+        if (data[key]) return data[key];
+      }
+      return null;
+    }
+
+    // ── Mapeo de rol técnico a nombre visible ────────────────────────────
+    function labelRol(rol) {
+      const mapa = {
+        SUPERVISOR  : 'Supervisor',
+        OFICIAL     : 'Oficial de Aduana',
+        ADMIN       : 'Administrador',
+        AUDITOR     : 'Auditor',
+      };
+      return mapa[rol?.toUpperCase()] || rol || 'Funcionario';
+    }
+
+    // ── Manejo de errores del GlobalExceptionHandler ─────────────────────
+    function mensajeDeError(status, data) {
+      // GlobalExceptionHandler retorna { message, status, timestamp }
+      const detalle = data?.message || data?.error || '';
+
+      switch (status) {
+        case 401:
+          return `<strong>Credenciales incorrectas.</strong><br>
+                  <small>Verifique su RUT y contraseña e intente nuevamente.</small>
+                  ${detalle ? `<br><small class="opacity-75">${detalle}</small>` : ''}`;
+        case 403:
+          return `<strong>Acceso denegado.</strong><br>
+                  <small>Su cuenta no tiene permisos para acceder al sistema.</small>
+                  ${detalle ? `<br><small class="opacity-75">${detalle}</small>` : ''}`;
+        case 404:
+          return `<strong>Servicio no encontrado.</strong><br>
+                  <small>El endpoint de autenticación no está disponible.</small>`;
+        case 500:
+          return `<strong>Error interno del servidor.</strong><br>
+                  <small>Contacte al administrador del sistema.</small>`;
+        default:
+          return detalle
+            ? `<strong>Error ${status}:</strong> ${detalle}`
+            : `<strong>Error inesperado (${status}).</strong> Intente nuevamente.`;
+      }
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    //  Submit principal
+    // ════════════════════════════════════════════════════════════════════
+    formLogin.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      limpiarAlertas();
+
+      const rut      = inputRut.value.trim();
+      const password = inputPassword.value;
+
+      // ── Validaciones client-side ──────────────────────────────────────
+      if (!rut || !password) {
+        mostrarAlerta('error', 'exclamation-circle-fill', 'Debe completar todos los campos.');
+        return;
+      }
+      if (!validarRut(rut)) {
+        mostrarAlerta('error', 'exclamation-circle-fill',
+          'El RUT no tiene el formato correcto. Ejemplo: <strong>12345678-9</strong>');
+        return;
+      }
+
+      setCargando(true);
+      mostrarAlerta('info', 'hourglass-split', 'Verificando credenciales con el servidor...');
+
+      try {
+        // ── 1. POST al Gateway → ms-auth ────────────────────────────────
+        const response = await fetch(LOGIN_ENDPOINT, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ username: rut, password })
+        });
+
+        // Intentar parsear JSON; si el body está vacío, usar {}
+        const data = await response.json().catch(() => ({}));
+
+        if (response.ok) {
+          // ── 2. Extraer y persistir token en localStorage ──────────────
+          const token = extraerToken(data);
+
+          if (!token) {
+            mostrarAlerta('error', 'x-circle-fill',
+              'El servidor no devolvió un token válido. Contacte al administrador.');
+            return;
+          }
+
+          // Guardar JWT y datos de sesión en localStorage (stateless)
+          localStorage.setItem('jwt_token',    token);
+          localStorage.setItem('jwt_rut',      rut);
+
+          // Decodificar payload para obtener nombre y rol
+          const payload  = decodificarJwt(token);
+          const nombre   = payload.sub   || payload.username || rut;
+          const rol      = payload.rol   || payload.role     || '';
+          const rolLabel = labelRol(rol);
+          const expMs    = payload.exp ? payload.exp * 1000 : null;
+
+          if (rol)   localStorage.setItem('jwt_rol',    rol);
+          if (expMs) localStorage.setItem('jwt_expiry', expMs);
+
+          // ── 3. Mensaje de bienvenida ──────────────────────────────────
+          const expInfo = expMs
+            ? `Sesión válida hasta las ${new Date(expMs).toLocaleTimeString('es-CL')}.`
+            : 'Sesión iniciada correctamente.';
+
+          mostrarAlerta('exito', 'check-circle-fill',
+            `<strong>Bienvenido, ${nombre}</strong> &mdash; ${rolLabel}<br>
+             <small>${expInfo} Redirigiendo al panel...</small>`);
+
+          // ── 4. Redirigir al dashboard ─────────────────────────────────
+          setTimeout(() => {
+            window.location.href = './dashboard.html';
+          }, 1600);
+
+        } else {
+          // ── Error HTTP del GlobalExceptionHandler (401, 403, etc.) ─────
+          mostrarAlerta('error', 'x-octagon-fill', mensajeDeError(response.status, data));
+        }
+
+      } catch (err) {
+        // ── Sin red o Gateway caído ───────────────────────────────────────
+        mostrarAlerta('error', 'wifi-off',
+          `<strong>No se pudo conectar con el servidor.</strong><br>
+           <small>Verifique que el API Gateway (puerto 9000) esté activo y que Docker esté corriendo.</small>`);
+        console.error('[Login] Error de red:', err);
+      } finally {
+        setCargando(false);
+      }
+    });
+  </script>
+</body>
+</html>

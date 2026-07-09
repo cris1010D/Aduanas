@@ -1,0 +1,66 @@
+-- ============================================================
+-- 08-create_pdi.sql
+-- MS: PDI (9007) | DB: pdi
+-- ============================================================
+\connect pdi
+
+DROP TABLE IF EXISTS proyeccion_antecedente CASCADE;
+DROP TABLE IF EXISTS consulta CASCADE;
+DROP TABLE IF EXISTS antecedente CASCADE;
+
+CREATE TABLE antecedente (
+    id             SERIAL PRIMARY KEY,
+    rut            VARCHAR(12) UNIQUE NOT NULL,
+    resultado      VARCHAR(20) NOT NULL,
+    fecha_consulta DATE NOT NULL,
+    fuente         VARCHAR(40) NOT NULL
+);
+
+CREATE TABLE consulta (
+    id          SERIAL PRIMARY KEY,
+    rut         VARCHAR(12) NOT NULL REFERENCES antecedente(rut),
+    rut_oficial VARCHAR(12) NOT NULL,
+    fecha       DATE NOT NULL,
+    motivo      VARCHAR(60) NOT NULL
+);
+
+CREATE TABLE proyeccion_antecedente (
+    rut            VARCHAR(12) PRIMARY KEY,
+    resultado      VARCHAR(20) NOT NULL,
+    fecha_consulta DATE NOT NULL,
+    fuente         VARCHAR(40) NOT NULL,
+    sincronizado   DATE NOT NULL
+);
+
+INSERT INTO antecedente (rut, resultado, fecha_consulta, fuente) VALUES
+('10111213-4', 'SIN_REGISTROS', '2025-01-05', 'REGISTRO_CIVIL'),
+('20212223-5', 'CON_REGISTROS', '2025-01-06', 'INTERPOL'),
+('30313233-6', 'SIN_REGISTROS', '2025-01-07', 'REGISTRO_CIVIL'),
+('40414243-7', 'SIN_REGISTROS', '2025-01-08', 'REGISTRO_CIVIL'),
+('50515253-8', 'PENDIENTE',     '2025-01-09', 'INTERPOL'),
+('60616263-9', 'SIN_REGISTROS', '2025-01-10', 'REGISTRO_CIVIL'),
+('70717273-K', 'CON_REGISTROS', '2025-01-11', 'INTERPOL'),
+('80818283-1', 'SIN_REGISTROS', '2025-01-12', 'REGISTRO_CIVIL'),
+('90919293-2', 'SIN_REGISTROS', '2025-01-13', 'REGISTRO_CIVIL');
+
+INSERT INTO consulta (rut, rut_oficial, fecha, motivo) VALUES
+('10111213-4', '12345678-9', '2025-01-05', 'INGRESO_FRONTERIZO'),
+('20212223-5', '98765432-1', '2025-01-06', 'ALERTA_INTERNACIONAL'),
+('30313233-6', '11111111-1', '2025-01-07', 'INGRESO_FRONTERIZO'),
+('40414243-7', '22222222-2', '2025-01-08', 'INGRESO_FRONTERIZO'),
+('50515253-8', '44444444-4', '2025-01-09', 'VERIFICACION_RUTINA'),
+('60616263-9', '55555555-5', '2025-01-10', 'INGRESO_FRONTERIZO'),
+('70717273-K', '66666666-6', '2025-01-11', 'ALERTA_INTERNACIONAL'),
+('80818283-1', '12345678-9', '2025-01-12', 'INGRESO_FRONTERIZO'),
+('90919293-2', '98765432-1', '2025-01-13', 'INGRESO_FRONTERIZO');
+
+INSERT INTO proyeccion_antecedente (rut, resultado, fecha_consulta, fuente, sincronizado) VALUES
+('10111213-4', 'SIN_REGISTROS', '2025-01-05', 'REGISTRO_CIVIL', '2025-01-05'),
+('20212223-5', 'CON_REGISTROS', '2025-01-06', 'INTERPOL',       '2025-01-06'),
+('30313233-6', 'SIN_REGISTROS', '2025-01-07', 'REGISTRO_CIVIL', '2025-01-07'),
+('40414243-7', 'SIN_REGISTROS', '2025-01-08', 'REGISTRO_CIVIL', '2025-01-08'),
+('50515253-8', 'PENDIENTE',     '2025-01-09', 'INTERPOL',       '2025-01-09'),
+('60616263-9', 'SIN_REGISTROS', '2025-01-10', 'REGISTRO_CIVIL', '2025-01-10'),
+('70717273-K', 'CON_REGISTROS', '2025-01-11', 'INTERPOL',       '2025-01-11'),
+('80818283-1', 'SIN_REGISTROS', '2025-01-12', 'REGISTRO_CIVIL', '2025-01-12'),
+('90919293-2', 'SIN_REGISTROS', '2025-01-13', 'REGISTRO_CIVIL', '2025-01-13');

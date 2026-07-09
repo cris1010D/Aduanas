@@ -1,0 +1,310 @@
+server:
+  port: 9000
+  error:
+    include-stacktrace: never
+
+spring:
+  application:
+    name: api-gateway
+
+  # ===========================================================
+  # SPRING CLOUD GATEWAY
+  # ===========================================================
+  cloud:
+    gateway:
+
+      # ---------------------------------------------------------
+      # CORS global: permite peticiones desde navegadores
+      # En produccion restringir allowedOrigins al dominio real
+      # ---------------------------------------------------------
+      globalcors:
+        corsConfigurations:
+          "[/**]":
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - PATCH
+            allowedHeaders: "*"
+            exposedHeaders:
+              - Authorization
+              - X-Request-ID
+
+      # ---------------------------------------------------------
+      # FILTROS POR DEFECTO aplicados a TODAS las rutas
+      #   - DedupeResponseHeader: elimina cabeceras CORS duplicadas
+      #     cuando el MS destino tambien las envia
+      #   - AddRequestHeader: marca de trazabilidad del gateway
+      # ---------------------------------------------------------
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+        - AddRequestHeader=X-Gateway-Source, api-gateway
+
+      # ---------------------------------------------------------
+      # RUTAS EXPLICITAS hacia cada microservicio
+      # Convencion de id: gateway-{ms}-{recurso}
+      # URI: lb://nombre-en-eureka (Spring Cloud LoadBalancer)
+      #
+      # Orden de declaracion importa: rutas mas especificas primero.
+      # ---------------------------------------------------------
+      routes:
+
+        # -------------------------------------------------------
+        # ms-auth (9001) — autenticacion y gestion de oficiales
+        # -------------------------------------------------------
+        - id: gateway-auth
+          uri: lb://ms-auth
+          predicates:
+            - Path=/api/v1/auth/**
+        - id: gateway-auth-oficiales
+          uri: lb://ms-auth
+          predicates:
+            - Path=/api/v1/oficiales/**
+
+        - id: gateway-auth-sesiones
+          uri: lb://ms-auth
+          predicates:
+            - Path=/api/v1/sesiones/**
+
+        # -------------------------------------------------------
+        # ms-proceso (9002) — viajeros, vehiculos, SAG, PDI
+        # -------------------------------------------------------
+        - id: gateway-proceso-viajeros
+          uri: lb://ms-proceso
+          predicates:
+            - Path=/api/v1/viajeros/**
+
+        - id: gateway-proceso-vehiculos
+          uri: lb://ms-proceso
+          predicates:
+            - Path=/api/v1/vehiculos/**
+
+        - id: gateway-proceso-sag
+          uri: lb://ms-proceso
+          predicates:
+            - Path=/api/v1/sag/**
+
+        - id: gateway-proceso-pdi
+          uri: lb://ms-proceso
+          predicates:
+            - Path=/api/v1/pdi/**
+
+        # -------------------------------------------------------
+        # ms-menores (9003) — validacion de menores de edad
+        # -------------------------------------------------------
+        - id: gateway-menores
+          uri: lb://ms-menores
+          predicates:
+            - Path=/api/v1/menores/**
+
+        - id: gateway-menores-autorizaciones
+          uri: lb://ms-menores
+          predicates:
+            - Path=/api/v1/autorizaciones/**
+
+        # -------------------------------------------------------
+        # ms-reporte (9004) — generacion de reportes
+        # -------------------------------------------------------
+        - id: gateway-reporte
+          uri: lb://ms-reporte
+          predicates:
+            - Path=/api/v1/reportes/**
+
+        # -------------------------------------------------------
+        # ms-auditoria (9005) — trazabilidad / logs inmutables
+        # -------------------------------------------------------
+        - id: gateway-auditoria
+          uri: lb://ms-auditoria
+          predicates:
+            - Path=/api/v1/logs/**
+
+        # -------------------------------------------------------
+        # ms-sag (9006) — declaraciones fitosanitarias
+        # -------------------------------------------------------
+        - id: gateway-sag-declaraciones
+          uri: lb://ms-sag
+          predicates:
+            - Path=/api/v1/declaraciones/**
+
+        # -------------------------------------------------------
+        # ms-pdi (9007) — consulta de antecedentes policiales
+        # -------------------------------------------------------
+        - id: gateway-pdi-antecedentes
+          uri: lb://ms-pdi
+          predicates:
+            - Path=/api/v1/antecedentes/**
+
+        - id: gateway-pdi-consultas
+          uri: lb://ms-pdi
+          predicates:
+            - Path=/api/v1/consultas/**
+
+        # -------------------------------------------------------
+        # ms-notaria (9008) — poderes notariales y documentos
+        # -------------------------------------------------------
+        - id: gateway-notaria-poderes
+          uri: lb://ms-notaria
+          predicates:
+            - Path=/api/v1/poderes/**
+
+        - id: gateway-notaria-documentos
+          uri: lb://ms-notaria
+          predicates:
+            - Path=/api/v1/documentos/**
+
+        # -------------------------------------------------------
+        # ms-monitoreo (9009) — dashboard de salud del ecosistema
+        # -------------------------------------------------------
+        - id: gateway-monitoreo
+          uri: lb://ms-monitoreo
+          predicates:
+            - Path=/api/v1/monitoreo/**
+
+        # -------------------------------------------------------
+        # ms-datos (9010) — cache Redis y configuracion global
+        # -------------------------------------------------------
+        - id: gateway-datos-cache
+          uri: lb://ms-datos
+          predicates:
+            - Path=/api/v1/cache/**
+
+        - id: gateway-datos-configuraciones
+          uri: lb://ms-datos
+          predicates:
+            - Path=/api/v1/configuraciones/**
+
+        # -------------------------------------------------------
+        # SWAGGER — api-docs por MS (gateway sirve UI central)
+        # Acceso: http://localhost:9000/swagger-ui/index.html
+        # -------------------------------------------------------
+        - id: swagger-docs-auth
+          uri: lb://ms-auth
+          predicates:
+            - Path=/v3/api-docs/ms-auth
+          filters:
+            - RewritePath=/v3/api-docs/ms-auth, /v3/api-docs
+
+        - id: swagger-docs-proceso
+          uri: lb://ms-proceso
+          predicates:
+            - Path=/v3/api-docs/ms-proceso
+          filters:
+            - RewritePath=/v3/api-docs/ms-proceso, /v3/api-docs
+
+        - id: swagger-docs-menores
+          uri: lb://ms-menores
+          predicates:
+            - Path=/v3/api-docs/ms-menores
+          filters:
+            - RewritePath=/v3/api-docs/ms-menores, /v3/api-docs
+
+        - id: swagger-docs-reporte
+          uri: lb://ms-reporte
+          predicates:
+            - Path=/v3/api-docs/ms-reporte
+          filters:
+            - RewritePath=/v3/api-docs/ms-reporte, /v3/api-docs
+
+        - id: swagger-docs-auditoria
+          uri: lb://ms-auditoria
+          predicates:
+            - Path=/v3/api-docs/ms-auditoria
+          filters:
+            - RewritePath=/v3/api-docs/ms-auditoria, /v3/api-docs
+
+        - id: swagger-docs-sag
+          uri: lb://ms-sag
+          predicates:
+            - Path=/v3/api-docs/ms-sag
+          filters:
+            - RewritePath=/v3/api-docs/ms-sag, /v3/api-docs
+
+        - id: swagger-docs-pdi
+          uri: lb://ms-pdi
+          predicates:
+            - Path=/v3/api-docs/ms-pdi
+          filters:
+            - RewritePath=/v3/api-docs/ms-pdi, /v3/api-docs
+
+        - id: swagger-docs-notaria
+          uri: lb://ms-notaria
+          predicates:
+            - Path=/v3/api-docs/ms-notaria
+          filters:
+            - RewritePath=/v3/api-docs/ms-notaria, /v3/api-docs
+
+        - id: swagger-docs-datos
+          uri: lb://ms-datos
+          predicates:
+            - Path=/v3/api-docs/ms-datos
+          filters:
+            - RewritePath=/v3/api-docs/ms-datos, /v3/api-docs
+
+        - id: swagger-docs-monitoreo
+          uri: lb://ms-monitoreo
+          predicates:
+            - Path=/v3/api-docs/ms-monitoreo
+          filters:
+            - RewritePath=/v3/api-docs/ms-monitoreo, /v3/api-docs
+
+# ---------------------------------------------------------------
+# SPRINGDOC — esto es lo que faltaba.
+# Sin este bloque, Swagger UI pide /v3/api-docs "a secas" y no
+# encuentra ninguna ruta que matchee -> "No operations defined".
+# Con esto, aparece el selector de microservicios arriba a la
+# derecha en /swagger-ui/index.html
+# ---------------------------------------------------------------
+springdoc:
+  swagger-ui:
+    urls:
+      - name: ms-auth
+        url: /v3/api-docs/ms-auth
+      - name: ms-proceso
+        url: /v3/api-docs/ms-proceso
+      - name: ms-menores
+        url: /v3/api-docs/ms-menores
+      - name: ms-reporte
+        url: /v3/api-docs/ms-reporte
+      - name: ms-auditoria
+        url: /v3/api-docs/ms-auditoria
+      - name: ms-sag
+        url: /v3/api-docs/ms-sag
+      - name: ms-pdi
+        url: /v3/api-docs/ms-pdi
+      - name: ms-notaria
+        url: /v3/api-docs/ms-notaria
+      - name: ms-datos
+        url: /v3/api-docs/ms-datos
+      - name: ms-monitoreo
+        url: /v3/api-docs/ms-monitoreo
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: "${spring.application.name}:${random.value}"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: api-gateway
+    version: 0.0.1
+    description: API Gateway - Sistema de Control Fronterizo de Aduanas

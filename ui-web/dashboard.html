@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Principal — Sistema de Control Fronterizo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --azul-institucional : #003366;
+      --azul-claro         : #004c99;
+      --azul-hover         : #002244;
+      --blanco             : #ffffff;
+      --gris-fondo         : #f8f9fa;
+      --gris-borde         : #dee2e6;
+      --texto-muted        : #6c757d;
+      --verde-exito        : #198754;
+      --rojo-alerta        : #dc3545;
+      --amarillo-warning   : #ffc107;
+    }
+    body { background-color:var(--gris-fondo); min-height:100vh; display:flex; flex-direction:column; font-family:'Segoe UI',system-ui,-apple-system,sans-serif; }
+    .navbar-institucional { background-color:var(--azul-institucional); padding:0 24px; min-height:56px; box-shadow:0 2px 8px rgba(0,0,0,0.3); }
+    .navbar-brand-custom { display:flex; align-items:center; gap:12px; color:var(--blanco)!important; text-decoration:none; }
+    .navbar-brand-custom .escudo { width:38px; height:38px; background:rgba(255,255,255,0.15); border-radius:50%; display:flex; align-items:center; justify-content:center; }
+    .navbar-brand-custom .escudo i { font-size:20px; color:var(--blanco); }
+    .navbar-brand-custom .brand-texto .sistema { font-size:0.88rem; font-weight:700; line-height:1.1; }
+    .navbar-brand-custom .brand-texto .sub { font-size:0.68rem; opacity:0.75; text-transform:uppercase; letter-spacing:0.05em; }
+    .oficial-info { display:flex; align-items:center; gap:10px; }
+    .oficial-avatar { width:36px; height:36px; background:rgba(255,255,255,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--blanco); }
+    .oficial-datos .nombre { font-size:0.82rem; font-weight:600; color:var(--blanco); line-height:1.1; }
+    .oficial-datos .rol-badge { font-size:0.65rem; background:rgba(255,255,255,0.2); color:var(--blanco); padding:1px 7px; border-radius:10px; text-transform:uppercase; }
+    .oficial-datos .sesion-exp { font-size:0.62rem; color:rgba(255,255,255,0.65); }
+    .btn-logout { background:rgba(220,53,69,0.85); border:none; color:var(--blanco); padding:6px 14px; border-radius:6px; font-size:0.8rem; font-weight:600; display:flex; align-items:center; gap:6px; cursor:pointer; transition:background 0.2s; }
+    .btn-logout:hover { background:#c82333; }
+    .bienvenida-bar { background:linear-gradient(135deg,var(--azul-institucional) 0%,var(--azul-claro) 100%); color:var(--blanco); padding:20px 24px 28px; }
+    .bienvenida-bar h4 { font-size:1.1rem; font-weight:700; margin:0 0 4px; }
+    .bienvenida-bar p { font-size:0.82rem; opacity:0.8; margin:0; }
+    .main-content { flex:1; padding:24px; margin-top:-12px; }
+    .seccion-titulo { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--texto-muted); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+    .seccion-titulo::after { content:''; flex:1; height:1px; background:var(--gris-borde); }
+    .card-funcion { border:none; border-radius:12px; box-shadow:0 3px 12px rgba(0,51,102,0.1); background:var(--blanco); transition:transform 0.15s,box-shadow 0.15s; cursor:pointer; height:100%; text-decoration:none; color:inherit; display:flex; flex-direction:column; }
+    .card-funcion:hover { transform:translateY(-4px); box-shadow:0 8px 24px rgba(0,51,102,0.18); color:inherit; }
+    .card-funcion .card-icono { width:56px; height:56px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; margin-bottom:14px; }
+    .card-funcion .card-body { padding:22px; display:flex; flex-direction:column; flex:1; }
+    .card-funcion h6 { font-size:0.9rem; font-weight:700; color:var(--azul-institucional); margin-bottom:6px; }
+    .card-funcion p { font-size:0.78rem; color:var(--texto-muted); margin:0; flex:1; }
+    .card-funcion .req-badge { display:inline-block; font-size:0.65rem; font-weight:700; padding:2px 8px; border-radius:10px; margin-top:12px; }
+    .card-funcion .card-footer-custom { padding:10px 22px; border-top:1px solid var(--gris-borde); font-size:0.75rem; color:var(--azul-claro); font-weight:600; display:flex; align-items:center; justify-content:space-between; border-radius:0 0 12px 12px; }
+    .icono-azul    { background:#e8f0fe; color:#1a5276; }
+    .icono-verde   { background:#e8f8f0; color:#1e8449; }
+    .icono-naranja { background:#fef5e7; color:#d35400; }
+    .icono-rojo    { background:#fdecea; color:#c0392b; }
+    .icono-purpura { background:#f4ecf7; color:#7d3c98; }
+    .icono-gris    { background:#f2f3f4; color:#566573; }
+    .card-estado { border:none; border-radius:12px; box-shadow:0 3px 12px rgba(0,51,102,0.1); background:var(--blanco); padding:20px; }
+    .estado-item { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--gris-borde); font-size:0.82rem; }
+    .estado-item:last-child { border-bottom:none; }
+    .estado-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .dot-up { background:var(--verde-exito); }
+    .dot-down { background:var(--rojo-alerta); }
+    .dot-unknown { background:var(--amarillo-warning); }
+    .modal-content { border-radius:12px; border:none; }
+    .modal-header { background:var(--azul-institucional); color:var(--blanco); border-radius:12px 12px 0 0; }
+    .modal-header .btn-close { filter:invert(1); }
+    #zona-flash { position:fixed; top:70px; right:20px; z-index:9999; width:340px; }
+    footer { background-color:var(--azul-institucional); color:rgba(255,255,255,0.6); text-align:center; font-size:0.7rem; padding:10px; }
+
+    /* ── Alerta resultado modal ── */
+    .resultado-box { border-radius:10px; padding:14px 16px; font-size:0.82rem; margin-top:12px; display:flex; gap:10px; align-items:flex-start; border:none; }
+    .resultado-exito   { background:#d1f0e0; color:#0b5e2e; }
+    .resultado-error   { background:#fde8e8; color:#7b1111; }
+    .resultado-warning { background:#fff3cd; color:#664d03; }
+    .resultado-info    { background:#dceeff; color:#0a3464; }
+    .resultado-box i   { font-size:1.1rem; flex-shrink:0; margin-top:1px; }
+    .resultado-box .res-titulo  { font-weight:700; font-size:0.88rem; }
+    .resultado-box .res-detalle { margin-top:4px; font-size:0.78rem; opacity:0.85; }
+    .resultado-box .res-json    { margin-top:6px; font-size:0.72rem; font-family:monospace; word-break:break-all; background:rgba(0,0,0,0.05); padding:6px 8px; border-radius:6px; }
+
+    /* SLA bar PDI */
+    .sla-wrap { margin-top:10px; }
+    .sla-label { display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px; }
+    .sla-bar { height:8px; background:#dee2e6; border-radius:4px; overflow:hidden; }
+    .sla-fill { height:100%; border-radius:4px; transition:width 0.6s; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar-institucional d-flex align-items-center justify-content-between">
+    <a href="./dashboard.html" class="navbar-brand-custom">
+      <div class="escudo"><i class="bi bi-shield-fill-check"></i></div>
+      <div class="brand-texto">
+        <div class="sistema">Control Fronterizo</div>
+        <div class="sub">Aduanas Chile</div>
+      </div>
+    </a>
+    <div class="d-flex align-items-center gap-3">
+      <div class="oficial-info">
+        <div class="oficial-avatar"><i class="bi bi-person-fill"></i></div>
+        <div class="oficial-datos">
+          <div class="nombre" id="nav-nombre">Cargando...</div>
+          <div>
+            <span class="rol-badge" id="nav-rol">—</span>
+            <span class="sesion-exp ms-1" id="nav-exp"></span>
+          </div>
+        </div>
+      </div>
+      <button class="btn-logout" id="btn-logout">
+        <i class="bi bi-box-arrow-right"></i>
+        <span class="d-none d-sm-inline">Salir</span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="bienvenida-bar">
+    <h4 id="bienvenida-saludo">Bienvenido, <span id="bienvenida-nombre">oficial</span></h4>
+    <p id="bienvenida-fecha">Sistema de Control Fronterizo — Panel de Operaciones</p>
+  </div>
+
+  <div id="zona-flash"></div>
+
+  <main class="main-content">
+    <div class="seccion-titulo"><i class="bi bi-grid-3x3-gap me-1"></i>Operaciones Fronterizas</div>
+    <div class="row g-3 mb-4">
+
+      <div class="col-12 col-sm-6 col-lg-4">
+        <a href="#" class="card-funcion" data-modulo="vehiculos" data-titulo="Admision de Vehiculos" data-endpoint="POST /api/v1/vehiculos/admitir">
+          <div class="card-body">
+            <div class="card-icono icono-azul"><i class="bi bi-truck-front-fill"></i></div>
+            <h6>Admision de Vehiculos</h6>
+            <p>Registro y control de ingreso y salida de vehiculos en pasos fronterizos. Incluye revision de patente, tipo y pais de origen.</p>
+            <span class="req-badge" style="background:#e8f0fe;color:#1a5276;">R.3 — ms-proceso</span>
+          </div>
+          <div class="card-footer-custom">
+            <span><i class="bi bi-arrow-right-circle me-1"></i>Iniciar registro</span>
+            <span><i class="bi bi-database me-1"></i>POST /api/v1/vehiculos</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-12 col-sm-6 col-lg-4">
+        <a href="#" class="card-funcion" data-modulo="sag" data-titulo="Declaracion SAG" data-endpoint="POST /api/v1/declaraciones">
+          <div class="card-body">
+            <div class="card-icono icono-verde"><i class="bi bi-leaf-fill"></i></div>
+            <h6>Declaracion SAG</h6>
+            <p>Tramitacion de declaraciones sanitarias y agricolas. Detecta automaticamente items en cuarentena segun las normas del SAG.</p>
+            <span class="req-badge" style="background:#e8f8f0;color:#1e8449;">R.5 — ms-sag</span>
+          </div>
+          <div class="card-footer-custom">
+            <span><i class="bi bi-arrow-right-circle me-1"></i>Nuevo tramite</span>
+            <span><i class="bi bi-database me-1"></i>POST /api/v1/declaraciones</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-12 col-sm-6 col-lg-4">
+        <a href="#" class="card-funcion" data-modulo="pdi" data-titulo="Consulta PDI" data-endpoint="POST /api/v1/consultas">
+          <div class="card-body">
+            <div class="card-icono icono-naranja"><i class="bi bi-shield-exclamation"></i></div>
+            <h6>Consulta PDI</h6>
+            <p>Verificacion de antecedentes en el registro de la PDI. Timeout de 2.0 segundos segun ISO 25010 — Eficiencia de Desempeno.</p>
+            <span class="req-badge" style="background:#fef5e7;color:#d35400;">R.6 — ms-pdi</span>
+          </div>
+          <div class="card-footer-custom">
+            <span><i class="bi bi-arrow-right-circle me-1"></i>Consultar RUT</span>
+            <span><i class="bi bi-clock me-1"></i>Timeout: 2.0 s</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-12 col-sm-6 col-lg-4">
+        <a href="#" class="card-funcion" data-modulo="menores" data-titulo="Autorizacion de Menores" data-endpoint="POST /api/v1/menores">
+          <div class="card-body">
+            <div class="card-icono icono-purpura"><i class="bi bi-people-fill"></i></div>
+            <h6>Autorizacion de Menores</h6>
+            <p>Validacion de permisos judiciales y notariales para salida de menores de edad. Verificacion paralela con ms-menores y ms-notaria.</p>
+            <span class="req-badge" style="background:#f4ecf7;color:#7d3c98;">R.2 — ms-menores</span>
+          </div>
+          <div class="card-footer-custom">
+            <span><i class="bi bi-arrow-right-circle me-1"></i>Validar permiso</span>
+            <span><i class="bi bi-lightning me-1"></i>Consulta paralela</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-12 col-sm-6 col-lg-4" id="card-reportes">
+        <a href="#" class="card-funcion" data-modulo="reportes" data-titulo="Exportar Reportes" data-endpoint="GET /api/v1/reportes/exportar">
+          <div class="card-body">
+            <div class="card-icono icono-rojo"><i class="bi bi-file-earmark-bar-graph-fill"></i></div>
+            <h6>Reportes de Trazabilidad</h6>
+            <p>Generacion y descarga de reportes de movimientos en formato PDF (OpenPDF) y Excel (Apache POI). Requiere rol SUPERVISOR.</p>
+            <span class="req-badge" style="background:#fdecea;color:#c0392b;">R.7/R.8 — SUPERVISOR</span>
+          </div>
+          <div class="card-footer-custom">
+            <span><i class="bi bi-download me-1"></i>Descargar reporte</span>
+            <span><i class="bi bi-lock me-1"></i>Solo supervisores</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-12 col-sm-6 col-lg-4">
+        <a href="#" class="card-funcion" data-modulo="monitoreo" data-titulo="Estado del Ecosistema" data-endpoint="GET /api/v1/monitoreo/status">
+          <div class="card-body">
+            <div class="card-icono icono-gris"><i class="bi bi-activity"></i></div>
+            <h6>Estado del Ecosistema</h6>
+            <p>Dashboard de salud de los 10 microservicios. Muestra estado UP/DOWN y clasificacion OPERATIVO / DEGRADADO / CRITICO.</p>
+            <span class="req-badge" style="background:#f2f3f4;color:#566573;">U3 — ms-monitoreo</span>
+          </div>
+          <div class="card-footer-custom">
+            <span><i class="bi bi-arrow-right-circle me-1"></i>Ver estado</span>
+            <span><i class="bi bi-hdd-network me-1"></i>10 servicios</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="seccion-titulo"><i class="bi bi-hdd-stack me-1"></i>Infraestructura</div>
+    <div class="row g-3">
+      <div class="col-12 col-md-6">
+        <div class="card-estado">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span style="font-size:0.82rem;font-weight:700;color:var(--azul-institucional);">
+              <i class="bi bi-server me-1"></i>Microservicios
+            </span>
+            <a href="#" id="btn-refresh-estado" style="font-size:0.75rem;color:var(--azul-claro);">
+              <i class="bi bi-arrow-clockwise"></i> Actualizar
+            </a>
+          </div>
+          <div id="lista-estado-ms">
+            <div class="text-center py-2" style="font-size:0.8rem;color:var(--texto-muted);">
+              <span class="spinner-border spinner-border-sm me-1"></span>Consultando estado...
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="card-estado">
+          <div class="mb-2" style="font-size:0.82rem;font-weight:700;color:var(--azul-institucional);">
+            <i class="bi bi-info-circle me-1"></i>Informacion de Sesion
+          </div>
+          <div class="estado-item"><i class="bi bi-person-badge" style="color:var(--azul-claro);"></i><span>RUT Oficial: <strong id="info-rut">—</strong></span></div>
+          <div class="estado-item"><i class="bi bi-shield-check" style="color:var(--verde-exito);"></i><span>Rol: <strong id="info-rol">—</strong></span></div>
+          <div class="estado-item"><i class="bi bi-clock-history" style="color:var(--azul-claro);"></i><span>Expiracion: <strong id="info-exp">—</strong></span></div>
+          <div class="estado-item"><i class="bi bi-hdd-network" style="color:var(--azul-claro);"></i><span>Gateway: <strong>localhost:9000</strong></span></div>
+          <div class="estado-item"><i class="bi bi-database-check" style="color:var(--verde-exito);"></i><span>PostgreSQL: <strong>localhost:5433</strong></span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Servicio Nacional de Aduanas de Chile &nbsp;·&nbsp;
+    Sistema de Control Fronterizo v1.0 &nbsp;·&nbsp;
+    Uso interno — acceso restringido
+  </footer>
+
+  <!-- Modal -->
+  <div class="modal fade" id="modalModulo" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modal-titulo">Modulo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p id="modal-descripcion" class="mb-2" style="font-size:0.88rem;"></p>
+          <div class="p-3 rounded mb-2" style="background:var(--gris-fondo);font-size:0.8rem;">
+            <strong>Endpoint:</strong> <code id="modal-endpoint"></code><br>
+            <strong>Gateway:</strong> <code>localhost:9000</code>
+          </div>
+          <div id="modal-form"></div>
+          <div id="modal-resultado"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-sm text-white" id="modal-btn-accion" style="background:var(--azul-institucional);">
+            <span id="btn-accion-txt"><i class="bi bi-arrow-right-circle me-1"></i>Ejecutar</span>
+            <span id="btn-accion-sp" class="d-none">
+              <span class="spinner-border spinner-border-sm me-1"></span>Procesando...
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const GATEWAY_URL = 'http://localhost:9000';
+    const token    = localStorage.getItem('jwt_token');
+    const rutLocal = localStorage.getItem('jwt_rut');
+    const rolLocal = localStorage.getItem('jwt_rol');
+    const expMs    = parseInt(localStorage.getItem('jwt_expiry') || '0');
+
+    if (!token) { window.location.href = './index.html'; }
+    if (expMs && Date.now() > expMs) { localStorage.clear(); window.location.href = './index.html'; }
+
+    function decodificarJwt(t) {
+      try { return JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); }
+      catch { return {}; }
+    }
+
+    const payload = decodificarJwt(token);
+    const nombre  = payload.nombre || payload.sub || payload.username || rutLocal || 'Oficial';
+    const rutReal = payload.rut    || payload.sub || rutLocal || '—';
+    const rol     = (payload.rol   || payload.role || rolLocal || 'OFICIAL').toUpperCase();
+
+    function labelRol(r) {
+      const m = { SUPERVISOR:'Supervisor', OFICIAL:'Oficial de Aduana', ADMIN:'Administrador', AUDITOR:'Auditor' };
+      return m[r?.toUpperCase()] || r || 'Funcionario';
+    }
+
+    // Saludo según hora
+    function saludo() {
+      const h = new Date().getHours();
+      if (h >= 6  && h < 13) return 'Buenos dias';
+      if (h >= 13 && h < 20) return 'Buenas tardes';
+      return 'Buenas noches';
+    }
+
+    document.getElementById('nav-nombre').textContent         = nombre;
+    document.getElementById('nav-rol').textContent            = labelRol(rol);
+    document.getElementById('bienvenida-nombre').textContent  = nombre;
+    document.getElementById('bienvenida-saludo').childNodes[0].textContent = saludo() + ', ';
+    document.getElementById('info-rut').textContent           = rutReal;
+    document.getElementById('info-rol').textContent           = labelRol(rol);
+
+    if (expMs) {
+      document.getElementById('nav-exp').textContent  = `Expira: ${new Date(expMs).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'})}`;
+      document.getElementById('info-exp').textContent = new Date(expMs).toLocaleString('es-CL');
+    }
+
+    const hoy = new Date().toLocaleDateString('es-CL',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    document.getElementById('bienvenida-fecha').textContent = hoy.charAt(0).toUpperCase() + hoy.slice(1);
+
+    if (rol !== 'SUPERVISOR') {
+      const c = document.getElementById('card-reportes');
+      if (c) c.style.opacity = '0.45';
+    }
+
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      localStorage.clear(); window.location.href = './index.html';
+    });
+
+    // ── Mensajes amigables por código HTTP ─────────────────────────────
+    function mensajeAmigable(status, data) {
+      const msg = data?.message || data?.error || '';
+      switch (status) {
+        case 400: return { tipo:'warning', icono:'bi-exclamation-triangle-fill',
+          titulo:'Datos incorrectos (400)',
+          detalle: msg || 'Uno o más campos tienen un formato inválido. Revise los datos ingresados.' };
+        case 401: return { tipo:'error', icono:'bi-lock-fill',
+          titulo:'No autorizado (401)',
+          detalle: msg || 'Su sesión ha expirado o el token no es válido. Vuelva a iniciar sesión.' };
+        case 403: return { tipo:'error', icono:'bi-shield-x-fill',
+          titulo:'Acceso denegado (403)',
+          detalle: msg || 'Su rol no tiene permisos para ejecutar esta acción en el sistema.' };
+        case 404: return { tipo:'warning', icono:'bi-search',
+          titulo:'Registro no encontrado (404)',
+          detalle: msg || 'El recurso solicitado no existe en la base de datos. Verifique los datos ingresados.' };
+        case 409: return { tipo:'warning', icono:'bi-exclamation-circle-fill',
+          titulo:'Registro duplicado (409)',
+          detalle: msg || 'Ya existe un registro con esos datos en el sistema.' };
+        case 500: return { tipo:'error', icono:'bi-bug-fill',
+          titulo:'Error interno del servidor (500)',
+          detalle: msg || 'Ocurrió un error inesperado. Contacte al administrador del sistema.' };
+        case 503: return { tipo:'error', icono:'bi-wifi-off',
+          titulo:'Servicio no disponible (503)',
+          detalle: msg || 'El microservicio no está disponible en este momento.' };
+        default:  return { tipo:'error', icono:'bi-x-octagon-fill',
+          titulo:`Error inesperado (${status})`,
+          detalle: msg || 'Respuesta no reconocida del servidor.' };
+      }
+    }
+
+    function mostrarResultado(tipo, icono, titulo, detalle, jsonExtra) {
+      const clases = { exito:'resultado-exito', error:'resultado-error', warning:'resultado-warning', info:'resultado-info' };
+      const jsonHtml = jsonExtra ? `<div class="res-json">${jsonExtra}</div>` : '';
+      document.getElementById('modal-resultado').innerHTML = `
+        <div class="resultado-box ${clases[tipo] || 'resultado-info'}">
+          <i class="bi ${icono}"></i>
+          <div>
+            <div class="res-titulo">${titulo}</div>
+            <div class="res-detalle">${detalle}</div>
+            ${jsonHtml}
+          </div>
+        </div>`;
+    }
+
+    function mostrarSLA(ms) {
+      const seg    = (ms / 1000).toFixed(2);
+      const pct    = Math.min((ms / 2000) * 100, 100).toFixed(0);
+      const color  = ms <= 1000 ? '#198754' : ms <= 2000 ? '#ffc107' : '#dc3545';
+      const estado = ms <= 2000 ? `✅ Dentro del SLA (${seg}s ≤ 2.0s)` : `⚠️ Fuera del SLA (${seg}s > 2.0s)`;
+      return `
+        <div class="sla-wrap">
+          <div class="sla-label">
+            <span>Tiempo de respuesta: <strong>${seg}s</strong></span>
+            <span style="font-size:0.72rem;color:var(--texto-muted);">ISO 25010 — SLA máx: 2.0s</span>
+          </div>
+          <div class="sla-bar"><div class="sla-fill" style="width:${pct}%;background:${color};"></div></div>
+          <div style="font-size:0.75rem;margin-top:4px;">${estado}</div>
+        </div>`;
+    }
+
+    function setBtnLoading(cargando) {
+      document.getElementById('btn-accion-txt').classList.toggle('d-none', cargando);
+      document.getElementById('btn-accion-sp').classList.toggle('d-none', !cargando);
+      document.getElementById('modal-btn-accion').disabled = cargando;
+    }
+
+    // ── Formularios dinámicos ──────────────────────────────────────────
+    const HOY   = new Date().toISOString().split('T')[0];
+    const VENCE = new Date(Date.now() + 180*24*60*60*1000).toISOString().split('T')[0];
+    const PASOS = `<option value="LOS_LIBERTADORES">Los Libertadores</option>
+                   <option value="CHACALLUTA">Chacalluta</option>
+                   <option value="COLCHANE">Colchane</option>
+                   <option value="PINO_HACHADO">Pino Hachado</option>`;
+
+    const FORMULARIOS = {
+      vehiculos: `
+        <div class="mb-2"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">Placa <span class="text-danger">*</span></label>
+          <input id="f-placa" type="text" class="form-control form-control-sm" placeholder="Ej: ABCD12" maxlength="20"></div>
+        <div class="mb-2"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">Propietario (RUT o nombre) <span class="text-danger">*</span></label>
+          <input id="f-prop" type="text" class="form-control form-control-sm" placeholder="Ej: 12345678-9" maxlength="80"></div>
+        <div class="row g-2">
+          <div class="col-6"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">Fecha Ingreso</label>
+            <input id="f-ing" type="date" class="form-control form-control-sm" value="${HOY}"></div>
+          <div class="col-6"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">Fecha Vencimiento</label>
+            <input id="f-venc" type="date" class="form-control form-control-sm" value="${VENCE}"></div>
+        </div>`,
+      pdi: `
+        <div class="mb-2"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">RUT Viajero <span class="text-danger">*</span></label>
+          <input id="f-pdi-rut" type="text" class="form-control form-control-sm" placeholder="Ej: 10111213-4" maxlength="12"></div>
+        <div class="mb-2"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">RUT Oficial <span class="text-danger">*</span></label>
+          <input id="f-pdi-oficial" type="text" class="form-control form-control-sm" placeholder="Ej: 12345678-9" maxlength="12"></div>
+        <div class="mb-2"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">Motivo <span class="text-danger">*</span></label>
+          <input id="f-pdi-motivo" type="text" class="form-control form-control-sm" placeholder="Ej: Control fronterizo rutinario"></div>
+        <div class="mb-1"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">Fecha</label>
+          <input id="f-pdi-fecha" type="date" class="form-control form-control-sm" value="${HOY}"></div>`,
+      sag: `
+        <div class="mb-2"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">RUT Viajero <span class="text-danger">*</span></label>
+          <input id="f-sag-rut" type="text" class="form-control form-control-sm" placeholder="Ej: 10111213-4" maxlength="12"></div>
+        <div class="mb-2"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">Paso Fronterizo</label>
+          <select id="f-sag-paso" class="form-select form-select-sm">${PASOS}</select></div>
+        <div class="mb-2"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">Descripcion del Producto <span class="text-danger">*</span></label>
+          <input id="f-sag-desc" type="text" class="form-control form-control-sm" placeholder="Ej: Frutas frescas, carnes, semillas"></div>
+        <div class="row g-2">
+          <div class="col-6"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">Cantidad</label>
+            <input id="f-sag-cant" type="number" class="form-control form-control-sm" min="1" value="1"></div>
+          <div class="col-6"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">Nivel de Riesgo</label>
+            <select id="f-sag-riesgo" class="form-select form-select-sm">
+              <option value="BAJO">BAJO</option><option value="MEDIO">MEDIO</option><option value="ALTO">ALTO</option>
+            </select></div>
+        </div>`,
+      menores: `
+        <div class="mb-2"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">RUT Menor <span class="text-danger">*</span></label>
+          <input id="f-men-rut" type="text" class="form-control form-control-sm" placeholder="Ej: 11223344-5" maxlength="12"></div>
+        <div class="mb-2"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">RUT Tutor <span class="text-danger">*</span></label>
+          <input id="f-men-tutor" type="text" class="form-control form-control-sm" placeholder="Ej: 12345678-9" maxlength="12"></div>
+        <div class="mb-2"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">Tipo de Autorizacion</label>
+          <select id="f-men-tipo" class="form-select form-select-sm">
+            <option value="NOTARIAL">NOTARIAL</option><option value="JUDICIAL">JUDICIAL</option>
+          </select></div>
+        <div class="mb-2"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">Paso Fronterizo</label>
+          <select id="f-men-paso" class="form-select form-select-sm">${PASOS}</select></div>
+        <div class="mb-1"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">Fecha</label>
+          <input id="f-men-fecha" type="date" class="form-control form-control-sm" value="${HOY}"></div>`,
+      reportes: `
+        <div class="mb-2"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">Formato de Exportacion</label>
+          <select id="f-rep-fmt" class="form-select form-select-sm">
+            <option value="pdf">PDF (OpenPDF)</option><option value="excel">Excel (Apache POI)</option>
+          </select></div>
+        <div class="mb-1"><label class="form-label form-label-sm fw-semibold" style="font-size:0.8rem;">RUT Oficial (opcional)</label>
+          <input id="f-rep-rut" type="text" class="form-control form-control-sm" placeholder="Dejar vacío para todos los registros" maxlength="12"></div>`,
+      monitoreo: ''
+    };
+
+    const descrips = {
+      vehiculos : 'Registra el ingreso de un vehiculo en el paso fronterizo. Se persiste en PostgreSQL y se publica un evento Kafka hacia ms-auditoria.',
+      sag       : 'Envia la declaracion de productos del viajero al SAG. Si se detectan items de riesgo ALTO, el resultado sera CUARENTENA.',
+      pdi       : 'Consulta los antecedentes del RUT en el registro de la PDI. Timeout 2.0s segun ISO 25010.',
+      menores   : 'Valida si el menor tiene autorizacion notarial o judicial vigente. Llamada paralela a ms-menores y ms-notaria.',
+      reportes  : 'Genera y descarga el reporte de trazabilidad en PDF o Excel. Requiere rol SUPERVISOR.',
+      monitoreo : 'Consulta el estado de salud de los microservicios del ecosistema via ms-monitoreo.'
+    };
+
+    // ── Click en tarjetas ──────────────────────────────────────────────
+    const modalEl = document.getElementById('modalModulo');
+    const bsModal = new bootstrap.Modal(modalEl);
+
+    document.querySelectorAll('.card-funcion').forEach(card => {
+      card.addEventListener('click', e => {
+        e.preventDefault();
+        const mod = card.dataset.modulo;
+        const rolActual = (decodificarJwt(localStorage.getItem('jwt_token') || '').rol || rolLocal || '').toUpperCase();
+
+        document.getElementById('modal-titulo').textContent    = card.dataset.titulo;
+        document.getElementById('modal-endpoint').textContent  = card.dataset.endpoint;
+        document.getElementById('modal-descripcion').textContent = descrips[mod] || '';
+        document.getElementById('modal-form').innerHTML        = FORMULARIOS[mod] || '';
+        document.getElementById('modal-resultado').innerHTML   = '';
+        document.getElementById('modal-btn-accion').dataset.modulo = mod;
+
+        if (mod === 'reportes' && rolActual !== 'SUPERVISOR') {
+          mostrarResultado('error','bi-lock-fill','Acceso restringido',
+            `Su rol actual (<strong>${labelRol(rolActual)}</strong>) no tiene permisos. Requiere rol <strong>SUPERVISOR</strong>.`);
+          document.getElementById('modal-btn-accion').disabled = true;
+        } else {
+          document.getElementById('modal-btn-accion').disabled = false;
+        }
+
+        bsModal.show();
+      });
+    });
+
+    // ── Acción Ejecutar ────────────────────────────────────────────────
+    document.getElementById('modal-btn-accion').addEventListener('click', async () => {
+      const mod     = document.getElementById('modal-btn-accion').dataset.modulo;
+      const hdrs    = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+      document.getElementById('modal-resultado').innerHTML = '';
+      setBtnLoading(true);
+
+      const v = id => document.getElementById(id)?.value?.trim() || '';
+
+      try {
+        let res, t0, elapsed;
+
+        // ── Validaciones client-side primero ──────────────────────────
+        if (mod === 'vehiculos') {
+          if (!v('f-placa') || !v('f-prop')) {
+            mostrarResultado('warning','bi-exclamation-triangle-fill','Campos obligatorios',
+              'Complete los campos <strong>Placa</strong> y <strong>Propietario</strong> antes de ejecutar.');
+            setBtnLoading(false); return;
+          }
+          t0  = Date.now();
+          res = await fetch(`${GATEWAY_URL}/api/v1/vehiculos/admitir`, {
+            method:'POST', headers:hdrs,
+            body: JSON.stringify({ placa:v('f-placa'), propietario:v('f-prop'), fechaIngreso:v('f-ing'), fechaVencimiento:v('f-venc') })
+          });
+
+        } else if (mod === 'pdi') {
+          if (!v('f-pdi-rut') || !v('f-pdi-oficial') || !v('f-pdi-motivo')) {
+            mostrarResultado('warning','bi-exclamation-triangle-fill','Campos obligatorios',
+              'Complete <strong>RUT Viajero</strong>, <strong>RUT Oficial</strong> y <strong>Motivo</strong>.');
+            setBtnLoading(false); return;
+          }
+          t0  = Date.now();
+          res = await fetch(`${GATEWAY_URL}/api/v1/consultas`, {
+            method:'POST', headers:hdrs,
+            body: JSON.stringify({ rut:v('f-pdi-rut'), rutOficial:v('f-pdi-oficial'), motivo:v('f-pdi-motivo'), fecha:v('f-pdi-fecha') })
+          });
+
+        } else if (mod === 'sag') {
+          if (!v('f-sag-rut') || !v('f-sag-desc')) {
+            mostrarResultado('warning','bi-exclamation-triangle-fill','Campos obligatorios',
+              'Complete <strong>RUT Viajero</strong> y <strong>Descripcion del Producto</strong>.');
+            setBtnLoading(false); return;
+          }
+          t0  = Date.now();
+          res = await fetch(`${GATEWAY_URL}/api/v1/declaraciones`, {
+            method:'POST', headers:hdrs,
+            body: JSON.stringify({
+              rutViajero: v('f-sag-rut'),
+              fecha: HOY,
+              pasoFronterizo: v('f-sag-paso'),
+              estado: 'PENDIENTE',
+              items: [{ descripcion: v('f-sag-desc'), cantidad: parseInt(document.getElementById('f-sag-cant')?.value || '1'), riesgo: v('f-sag-riesgo') }]
+            })
+          });
+
+        } else if (mod === 'menores') {
+          if (!v('f-men-rut') || !v('f-men-tutor')) {
+            mostrarResultado('warning','bi-exclamation-triangle-fill','Campos obligatorios',
+              'Complete <strong>RUT Menor</strong> y <strong>RUT Tutor</strong>.');
+            setBtnLoading(false); return;
+          }
+          t0  = Date.now();
+          res = await fetch(`${GATEWAY_URL}/api/v1/menores`, {
+            method:'POST', headers:hdrs,
+            body: JSON.stringify({ rut:v('f-men-rut'), rutTutor:v('f-men-tutor'), tipo:v('f-men-tipo'), pasoFronterizo:v('f-men-paso'), fecha:v('f-men-fecha') })
+          });
+
+        } else if (mod === 'reportes') {
+          const fmt    = v('f-rep-fmt');
+          const rutRep = v('f-rep-rut');
+          const params = rutRep ? `?rutOficial=${encodeURIComponent(rutRep)}` : '';
+          t0  = Date.now();
+          res = await fetch(`${GATEWAY_URL}/api/v1/reportes/exportar/${fmt}${params}`, { headers: hdrs });
+          elapsed = Date.now() - t0;
+          if (res.ok) {
+            const blob = await res.blob();
+            const ext  = fmt === 'pdf' ? 'pdf' : 'xlsx';
+            const fn   = `reporte_${HOY}.${ext}`;
+            const a    = document.createElement('a');
+            a.href     = URL.createObjectURL(blob);
+            a.download = fn; a.click();
+            URL.revokeObjectURL(a.href);
+            mostrarResultado('exito','bi-download','Reporte descargado correctamente',`Archivo generado: <strong>${fn}</strong>`);
+            setBtnLoading(false); return;
+          }
+
+        } else if (mod === 'monitoreo') {
+          t0  = Date.now();
+          res = await fetch(`${GATEWAY_URL}/api/v1/monitoreo/status`, { headers: hdrs });
+        }
+
+        elapsed = elapsed || (Date.now() - t0);
+        const data = await res.json().catch(() => ({}));
+
+        if (res.ok) {
+          // ── Respuestas exitosas con lógica de negocio ────────────────
+          if (mod === 'vehiculos') {
+            mostrarResultado('exito','bi-check-circle-fill','Vehiculo admitido correctamente',
+              `Placa: <strong>${data.placa || v('f-placa')}</strong> — Vigencia hasta: <strong>${data.fechaVencimiento || VENCE}</strong> (180 días)`);
+          } else if (mod === 'pdi') {
+            const resultado  = data.resultado || 'SIN_REGISTROS';
+            const sinReg     = resultado === 'SIN_REGISTROS';
+            const slaHtml    = mostrarSLA(elapsed);
+            mostrarResultado(
+              sinReg ? 'exito' : 'error',
+              sinReg ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill',
+              sinReg ? 'Sin antecedentes — Habilitado para ingreso' : 'ALERTA — Antecedentes encontrados',
+              `RUT: <strong>${data.rut || v('f-pdi-rut')}</strong> · Fuente: ${data.fuente || '—'} · Resultado: <strong>${resultado}</strong>${slaHtml}`
+            );
+          } else if (mod === 'sag') {
+            const estado    = data.estado || 'APROBADO';
+            const cuarentena = estado === 'CUARENTENA' || estado === 'RECHAZADO';
+            mostrarResultado(
+              cuarentena ? 'warning' : 'exito',
+              cuarentena ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill',
+              cuarentena ? '⚠️ CUARENTENA — Items de riesgo detectados' : '✅ Declaracion aprobada',
+              cuarentena
+                ? 'Se detectaron ítems de riesgo ALTO. El viajero debe pasar por inspección fitosanitaria obligatoria.'
+                : `Declaracion registrada correctamente. Estado: <strong>${estado}</strong>`
+            );
+          } else if (mod === 'menores') {
+            mostrarResultado('exito','bi-check-circle-fill','Autorizacion validada correctamente',
+              `Menor RUT <strong>${data.rut || v('f-men-rut')}</strong> — Tipo: <strong>${data.tipo || v('f-men-tipo')}</strong> — Orquestacion paralela ms-menores + ms-notaria completada.`);
+          } else if (mod === 'monitoreo') {
+            mostrarResultado('info','bi-activity','Estado del ecosistema recibido',
+              `<code style="font-size:0.72rem;">${JSON.stringify(data).substring(0,200)}</code>`);
+          }
+        } else {
+          // ── Errores HTTP — mostrar mensaje amigable ──────────────────
+          const { tipo, icono, titulo, detalle } = mensajeAmigable(res.status, data);
+          mostrarResultado(tipo, icono, titulo, detalle);
+        }
+
+      } catch (err) {
+        // ── Sin red o Gateway caído ──────────────────────────────────
+        mostrarResultado('error','bi-wifi-off','Sin conexion con el Gateway',
+          `No se pudo conectar con <code>localhost:9000</code>. Verifique que Docker esté corriendo y todos los microservicios estén activos.<br><small style="opacity:0.7;">${err.message}</small>`);
+      }
+
+      setBtnLoading(false);
+    });
+
+    // ── Estado MS ──────────────────────────────────────────────────────
+    async function cargarEstadoMS() {
+      const lista = document.getElementById('lista-estado-ms');
+      try {
+        const res  = await fetch(`${GATEWAY_URL}/api/v1/monitoreo/status`, { headers:{ 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        const estados = data.estados || data || [];
+        if (!Array.isArray(estados) || !estados.length) throw new Error('Sin datos');
+        lista.innerHTML = estados.map(e => {
+          const up = e.estado === 'UP';
+          return `<div class="estado-item">
+            <div class="estado-dot ${up?'dot-up':'dot-down'}"></div>
+            <span style="flex:1;">${e.nombreMs || e.nombre || e.servicio || '—'}</span>
+            <span style="font-size:0.75rem;font-weight:600;color:${up?'var(--verde-exito)':'var(--rojo-alerta)'};">${e.estado}</span>
+          </div>`;
+        }).join('');
+        lista.innerHTML += `<div class="estado-item">
+          <div class="estado-dot dot-up"></div>
+          <span style="flex:1;">ms-monitoreo</span>
+          <span style="font-size:0.75rem;font-weight:600;color:var(--verde-exito);">UP</span>
+        </div>`;
+      } catch {
+        const fallback = ['ms-auth','ms-proceso','ms-menores','ms-sag','ms-pdi','ms-notaria','ms-auditoria','ms-reporte','ms-monitoreo','ms-datos'];
+        lista.innerHTML = fallback.map(ms => `
+          <div class="estado-item">
+            <div class="estado-dot dot-unknown"></div>
+            <span style="flex:1;">${ms}</span>
+            <span style="font-size:0.75rem;color:var(--texto-muted);">Desconocido</span>
+          </div>`).join('');
+      }
+    }
+
+    cargarEstadoMS();
+    document.getElementById('btn-refresh-estado').addEventListener('click', e => {
+      e.preventDefault();
+      document.getElementById('lista-estado-ms').innerHTML =
+        '<div class="text-center py-2" style="font-size:0.8rem;color:var(--texto-muted);"><span class="spinner-border spinner-border-sm me-1"></span>Actualizando...</div>';
+      cargarEstadoMS();
+    });
+  </script>
+</body>
+</html>

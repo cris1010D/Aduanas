@@ -1,0 +1,55 @@
+server:
+  port: 9009
+  error:
+    include-stacktrace: never
+
+spring:
+  application:
+    name: ms-monitoreo
+
+# Bloque de Seguridad Criptográfica Agregado para el Ecosistema
+jwt:
+  secret: "dG9rZW5TZWNyZXRLZXlBZHVhbmFzMjAyNlRyaXNrZWxlZHVTZWN1cml0eUZyb250ZXJpem8="
+  expiration-ms: 3600000
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: "${spring.application.name}:${random.value}"
+    lease-renewal-interval-in-seconds: 15
+    lease-expiration-duration-in-seconds: 60
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: ms-monitoreo
+    version: 0.0.1
+    description: Microservicio de Salud Centralizada via Actuator - Aduanas
+
+# Feign: timeouts cortos para health checks — si un MS no responde en 3s se marca DOWN
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 1000
+        readTimeout: 3000
+      eureka-server:
+        connectTimeout: 1000
+        readTimeout: 3000
+        url: http://localhost:8761
