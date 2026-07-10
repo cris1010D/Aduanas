@@ -1,17 +1,5 @@
-<<<<<<< HEAD
-target/
-.mvn/
-*.class
-.idea/
-*.iml
-.env
-=======
 target/ 
 .mvn/wrapper/maven-wrapper.jar 
 *.class 
 *.log 
 .env 
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
-jdk21.zip
-jdk-21.0.11/
-*.zip

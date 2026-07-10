@@ -11,4 +11,8 @@ public interface OficialRepository extends JpaRepository<Oficial, Integer> {
     List<Oficial> findByActivoTrue();
     boolean existsByRut(String rut);
     List<Oficial> findAllByOrderByIdAsc();
+
+    // Nuevo: permite filtrar usuarios por rol (ej. "TRANSPORTISTA") para
+    // alimentar la pestaña de Transportistas del dashboard de supervisor.
+    List<Oficial> findByRol(String rol);
 }

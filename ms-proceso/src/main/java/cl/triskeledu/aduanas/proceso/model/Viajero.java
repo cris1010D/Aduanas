@@ -3,11 +3,8 @@ package cl.triskeledu.aduanas.proceso.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-<<<<<<< HEAD
 import java.time.LocalDate;
 
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 @Entity
 @Table(name = "viajero")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
@@ -28,7 +25,6 @@ public class Viajero {
 
     @Column(nullable = false, length = 40)
     private String nacionalidad;
-<<<<<<< HEAD
 
     // ── Documento de viaje (migración avanzada) ─────────────────────────
     @Column(name = "tipo_documento", length = 20)
@@ -74,6 +70,3 @@ public class Viajero {
     @Column(name = "seguro_proveedor", length = 80)
     private String seguroProveedor;
 }
-=======
-}
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7

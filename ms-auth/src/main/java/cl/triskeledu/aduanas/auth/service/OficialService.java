@@ -1,16 +1,6 @@
 package cl.triskeledu.aduanas.auth.service;
 
-<<<<<<< HEAD
 import cl.triskeledu.aduanas.auth.dto.*;
-=======
-import cl.triskeledu.aduanas.auth.dto.LoginRequest;
-import cl.triskeledu.aduanas.auth.dto.LoginResponse;
-import cl.triskeledu.aduanas.auth.dto.OficialCreateRequest;
-import cl.triskeledu.aduanas.auth.dto.OficialResponse;
-import cl.triskeledu.aduanas.auth.dto.OficialUpdateRequest;
-import cl.triskeledu.aduanas.auth.dto.RegistroViajeroRequest;
-import cl.triskeledu.aduanas.auth.dto.RegistroViajeroResponse;
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 import cl.triskeledu.aduanas.auth.event.OficialEventProducer;
 import cl.triskeledu.aduanas.auth.mapper.OficialMapper;
 import cl.triskeledu.aduanas.auth.model.Oficial;
@@ -40,7 +30,7 @@ public class OficialService {
     private final OficialRepository oficialRepository;
     private final OficialMapper oficialMapper;
     private final OficialEventProducer oficialEventProducer;
-    
+
     // Inyecciones para la seguridad agregadas por requerimiento
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -62,12 +52,7 @@ public class OficialService {
         }
 
         // 3. Validar el password enviado contra el hash almacenado usando PasswordEncoder
-        // --- DEBUG: remover antes de produccion ---
-        log.debug("[AUTH-DEBUG] Password recibido (raw)       : '{}'", request.getPassword());
-        log.debug("[AUTH-DEBUG] Hash almacenado en BD (rut={}) : '{}'", oficial.getRut(), oficial.getPassword());
         boolean passwordValido = passwordEncoder.matches(request.getPassword(), oficial.getPassword());
-        log.debug("[AUTH-DEBUG] Resultado passwordEncoder.matches(): {}", passwordValido);
-        // ------------------------------------------
         if (!passwordValido) {
             throw new UsernameNotFoundException("Credenciales inválidas en el sistema de Aduanas");
         }
@@ -76,6 +61,7 @@ public class OficialService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("rol", oficial.getRol());
         claims.put("nombre", oficial.getNombre());
+        claims.put("empresa", oficial.getEmpresa()); // null salvo para TRANSPORTISTA
 
         // 5. Emitir token firmado usando el componente de Common
         String token = jwtTokenProvider.generateToken(oficial.getRut(), claims);
@@ -93,6 +79,15 @@ public class OficialService {
         return oficialMapper.toResponseList(oficialRepository.findByActivoTrue());
     }
 
+    /**
+     * Lista usuarios filtrados por rol (ej: "TRANSPORTISTA", "VIAJERO", "OFICIAL").
+     * Usado por la pestaña de Transportistas del dashboard de supervisor.
+     */
+    public List<OficialResponse> listarPorRol(String rol) {
+        log.info("Listando oficiales con rol: {}", rol);
+        return oficialMapper.toResponseList(oficialRepository.findByRol(rol));
+    }
+
     public OficialResponse buscarPorId(Integer id) {
         log.info("Buscando oficial por id: {}", id);
         return oficialMapper.toResponse(getOficialById(id));
@@ -101,8 +96,8 @@ public class OficialService {
     public OficialResponse buscarPorRut(String rut) {
         log.info("Buscando oficial por rut: {}", rut);
         return oficialMapper.toResponse(
-            oficialRepository.findByRut(rut)
-                .orElseThrow(() -> new EntityNotFoundException("Oficial", "rut", rut))
+                oficialRepository.findByRut(rut)
+                        .orElseThrow(() -> new EntityNotFoundException("Oficial", "rut", rut))
         );
     }
 
@@ -114,12 +109,12 @@ public class OficialService {
         oficial.setPassword(passwordEncoder.encode(request.getPassword()));
         Oficial guardado = oficialRepository.save(oficial);
         oficialEventProducer.sendOficialCreated(
-            OficialCreatedEvent.builder()
-                .rut(guardado.getRut())
-                .nombre(guardado.getNombre())
-                .rol(guardado.getRol())
-                .activo(guardado.getActivo())
-                .build()
+                OficialCreatedEvent.builder()
+                        .rut(guardado.getRut())
+                        .nombre(guardado.getNombre())
+                        .rol(guardado.getRol())
+                        .activo(guardado.getActivo())
+                        .build()
         );
         return oficialMapper.toResponse(guardado);
     }
@@ -134,12 +129,12 @@ public class OficialService {
         oficialMapper.updateEntity(request, oficial);
         Oficial actualizado = oficialRepository.save(oficial);
         oficialEventProducer.sendOficialUpdated(
-            OficialUpdatedEvent.builder()
-                .rut(actualizado.getRut())
-                .nombre(actualizado.getNombre())
-                .rol(actualizado.getRol())
-                .activo(actualizado.getActivo())
-                .build()
+                OficialUpdatedEvent.builder()
+                        .rut(actualizado.getRut())
+                        .nombre(actualizado.getNombre())
+                        .rol(actualizado.getRol())
+                        .activo(actualizado.getActivo())
+                        .build()
         );
         return oficialMapper.toResponse(actualizado);
     }
@@ -151,9 +146,9 @@ public class OficialService {
         Oficial oficial = getOficialById(id);
         oficialRepository.delete(oficial);
         oficialEventProducer.sendOficialDeleted(
-            OficialDeletedEvent.builder()
-                .rut(oficial.getRut())
-                .build()
+                OficialDeletedEvent.builder()
+                        .rut(oficial.getRut())
+                        .build()
         );
     }
 
@@ -173,12 +168,12 @@ public class OficialService {
         validarRutUnico(request.getRut());
 
         Oficial viajero = Oficial.builder()
-            .rut(request.getRut())
-            .nombre(request.getNombre())
-            .rol("VIAJERO")
-            .activo(true)
-            .password(passwordEncoder.encode(request.getPassword()))
-            .build();
+                .rut(request.getRut())
+                .nombre(request.getNombre())
+                .rol("VIAJERO")
+                .activo(true)
+                .password(passwordEncoder.encode(request.getPassword()))
+                .build();
 
         Oficial guardado = oficialRepository.save(viajero);
         log.info("Viajero registrado exitosamente: {}", guardado.getRut());
@@ -190,27 +185,14 @@ public class OficialService {
         String token = jwtTokenProvider.generateToken(guardado.getRut(), claims);
 
         return RegistroViajeroResponse.builder()
-            .id(guardado.getId())
-            .rut(guardado.getRut())
-            .nombre(guardado.getNombre())
-            .rol(guardado.getRol())
-            .token(token)
-            .mensaje("Registro exitoso. Bienvenido al Sistema de Aduanas.")
-            .build();
+                .id(guardado.getId())
+                .rut(guardado.getRut())
+                .nombre(guardado.getNombre())
+                .rol(guardado.getRol())
+                .token(token)
+                .mensaje("Registro exitoso. Bienvenido al Sistema de Aduanas.")
+                .build();
     }
-
-    @SuppressWarnings("null")
-    private Oficial getOficialById(Integer id) {
-        return oficialRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Oficial", "id", id));
-    }
-
-    private void validarRutUnico(String rut) {
-        if (oficialRepository.existsByRut(rut)) {
-            throw new DuplicateResourceException("Oficial", "rut", rut, rut);
-        }
-    }
-<<<<<<< HEAD
 
     /**
      * Registro público de transportistas/choferes comerciales. No requiere token.
@@ -231,6 +213,7 @@ public class OficialService {
                 .nombre(request.getNombre())
                 .rol("TRANSPORTISTA")
                 .activo(true)
+                .empresa(request.getEmpresa())   // <- FIX: antes se perdía, no se asignaba a la entidad
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
 
@@ -240,18 +223,29 @@ public class OficialService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("rol", guardado.getRol());
         claims.put("nombre", guardado.getNombre());
+        claims.put("empresa", guardado.getEmpresa()); // <- FIX: ahora también viaja en el JWT
         String token = jwtTokenProvider.generateToken(guardado.getRut(), claims);
 
         return RegistroTransportistaResponse.builder()
                 .id(guardado.getId())
                 .rut(guardado.getRut())
                 .nombre(guardado.getNombre())
-                .empresa(request.getEmpresa())
+                .empresa(guardado.getEmpresa())   // <- ahora viene de la entidad guardada, no solo del request
                 .rol(guardado.getRol())
                 .token(token)
                 .mensaje("Registro exitoso. Bienvenido al Portal de Transportistas.")
                 .build();
     }
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
+
+    @SuppressWarnings("null")
+    private Oficial getOficialById(Integer id) {
+        return oficialRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Oficial", "id", id));
+    }
+
+    private void validarRutUnico(String rut) {
+        if (oficialRepository.existsByRut(rut)) {
+            throw new DuplicateResourceException("Oficial", "rut", rut, rut);
+        }
+    }
 }

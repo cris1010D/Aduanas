@@ -181,11 +181,8 @@ spring:
           predicates:
             - Path=/api/v1/configuraciones/**
 
-<<<<<<< HEAD
 
 
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
         # -------------------------------------------------------
         # SWAGGER — api-docs por MS (gateway sirve UI central)
         # Acceso: http://localhost:9000/swagger-ui/index.html
@@ -260,11 +257,8 @@ spring:
           filters:
             - RewritePath=/v3/api-docs/ms-monitoreo, /v3/api-docs
 
-<<<<<<< HEAD
 
 
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 # ---------------------------------------------------------------
 # SPRINGDOC — esto es lo que faltaba.
 # Sin este bloque, Swagger UI pide /v3/api-docs "a secas" y no
@@ -322,9 +316,5 @@ info:
   app:
     name: api-gateway
     version: 0.0.1
-<<<<<<< HEAD
     description: API Gateway - Sistema de Control Fronterizo de Aduanas
 
-=======
-    description: API Gateway - Sistema de Control Fronterizo de Aduanas
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7

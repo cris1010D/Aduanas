@@ -1,13 +1,6 @@
 package cl.triskeledu.aduanas.auth.controller;
 
-<<<<<<< HEAD
 import cl.triskeledu.aduanas.auth.dto.*;
-=======
-import cl.triskeledu.aduanas.auth.dto.LoginRequest;
-import cl.triskeledu.aduanas.auth.dto.LoginResponse;
-import cl.triskeledu.aduanas.auth.dto.RegistroViajeroRequest;
-import cl.triskeledu.aduanas.auth.dto.RegistroViajeroResponse;
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 import cl.triskeledu.aduanas.auth.service.OficialService;
 import org.springframework.http.HttpStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,7 +48,6 @@ public class AuthController {
         RegistroViajeroResponse response = oficialService.registrarViajero(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-<<<<<<< HEAD
 
     @Operation(summary = "Registro de transportista/chofer comercial (publico, sin token)")
     @ApiResponses({
@@ -70,6 +62,4 @@ public class AuthController {
         RegistroTransportistaResponse response = oficialService.registrarTransportista(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 }

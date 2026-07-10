@@ -14,7 +14,6 @@ public class VehiculoResponse {
     private String propietario;
     private LocalDate fechaIngreso;
     private LocalDate fechaVencimiento;
-<<<<<<< HEAD
 
     private String rutPropietario;
     private Boolean esComercial;
@@ -26,6 +25,3 @@ public class VehiculoResponse {
     private String modelo;
     private Integer anio;
 }
-=======
-}
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7

@@ -63,7 +63,6 @@ public class VehiculoService {
         LocalDate fechaVencimiento = fechaIngreso.plusDays(DIAS_VIGENCIA);
 
         Vehiculo vehiculo = Vehiculo.builder()
-<<<<<<< HEAD
                 .placa(request.getPlaca())
                 .propietario(request.getPropietario())
                 .fechaIngreso(fechaIngreso)
@@ -77,13 +76,6 @@ public class VehiculoService {
                 .modelo(request.getModelo())
                 .anio(request.getAnio())
                 .build();
-=======
-            .placa(request.getPlaca())
-            .propietario(request.getPropietario())
-            .fechaIngreso(fechaIngreso)
-            .fechaVencimiento(fechaVencimiento)
-            .build();
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 
         Vehiculo guardado = vehiculoRepository.save(vehiculo);
         log.info("Vehiculo {} admitido. Ingreso: {} | Vencimiento: {}",
@@ -106,7 +98,7 @@ public class VehiculoService {
     }
 
     @Transactional
-    //@SuppressWarnings("null")
+    @SuppressWarnings("null")
     public VehiculoResponse actualizar(Integer id, VehiculoRequest request) {
         log.info("Actualizando vehiculo id: {}", id);
         Vehiculo vehiculo = getVehiculoById(id);
@@ -134,12 +126,9 @@ public class VehiculoService {
             throw new DuplicateResourceException("Vehiculo", "placa", placa, placa);
         }
     }
-<<<<<<< HEAD
 
     public List<VehiculoResponse> listarPorRutPropietario(String rut) {
         log.info("Listando vehiculos del propietario/transportista: {}", rut);
         return vehiculoMapper.toResponseList(vehiculoRepository.findByRutPropietario(rut));
     }
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 }

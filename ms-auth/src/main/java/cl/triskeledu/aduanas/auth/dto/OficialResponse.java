@@ -12,4 +12,5 @@ public class OficialResponse {
     private String nombre;
     private String rol;
     private Boolean activo;
+    private String empresa; // null salvo para usuarios con rol TRANSPORTISTA
 }

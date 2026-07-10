@@ -113,10 +113,10 @@ public class VehiculoController {
         vehiculoService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
-<<<<<<< HEAD
 
     @Operation(summary = "Listar vehiculos de un propietario/transportista por RUT")
     @GetMapping("/rut/{rut}")
+    @SuppressWarnings("null")
     public ResponseEntity<CollectionModel<EntityModel<VehiculoResponse>>> listarPorRut(@PathVariable String rut) {
         List<EntityModel<VehiculoResponse>> items = vehiculoService.listarPorRutPropietario(rut).stream()
                 .map(v -> EntityModel.of(v,
@@ -125,6 +125,4 @@ public class VehiculoController {
         return ResponseEntity.ok(CollectionModel.of(items,
                 linkTo(methodOn(VehiculoController.class).listarPorRut(rut)).withSelfRel()));
     }
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 }

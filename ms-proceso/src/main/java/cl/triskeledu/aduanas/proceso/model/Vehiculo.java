@@ -25,7 +25,6 @@ public class Vehiculo {
 
     @Column(name = "fecha_vencimiento", nullable = false)
     private LocalDate fechaVencimiento;
-<<<<<<< HEAD
 
     // ── Campos nuevos para vehículos comerciales / transportistas ──────────
     @Column(name = "rut_propietario", length = 12)
@@ -53,6 +52,3 @@ public class Vehiculo {
     @Column(name = "anio")
     private Integer anio;
 }
-=======
-}
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7

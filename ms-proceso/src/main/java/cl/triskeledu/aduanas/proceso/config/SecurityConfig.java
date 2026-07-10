@@ -29,7 +29,7 @@ public class SecurityConfig {
     public FilterRegistrationBean<JwtAuthenticationFilter> disableJwtFilterAutoRegistration(
             JwtAuthenticationFilter filter) {
         FilterRegistrationBean<JwtAuthenticationFilter> registration =
-            new FilterRegistrationBean<>(filter);
+                new FilterRegistrationBean<>(filter);
         registration.setEnabled(false);
         return registration;
     }
@@ -40,9 +40,9 @@ public class SecurityConfig {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
             response.getWriter().write(
-                "{\"status\":401,\"error\":\"Unauthorized\"," +
-                "\"message\":\"Token de autenticacion requerido\"," +
-                "\"path\":\"" + request.getRequestURI() + "\"}"
+                    "{\"status\":401,\"error\":\"Unauthorized\"," +
+                            "\"message\":\"Token de autenticacion requerido\"," +
+                            "\"path\":\"" + request.getRequestURI() + "\"}"
             );
         };
     }
@@ -51,48 +51,42 @@ public class SecurityConfig {
     @SuppressWarnings("null")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
-                .requestMatchers("/actuator/**", "/error").permitAll()
-                .requestMatchers("/api/v1/auth/**").permitAll()
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/actuator/**", "/error").permitAll()
+                        .requestMatchers("/api/v1/auth/**").permitAll()
 
-                .requestMatchers(HttpMethod.GET,    "/api/v1/viajeros/**").hasAnyRole("SUPERVISOR", "OFICIAL", "INSPECTOR", "VIAJERO")
-                .requestMatchers(HttpMethod.POST,   "/api/v1/viajeros/**").hasAnyRole("SUPERVISOR", "OFICIAL", "VIAJERO")
-                .requestMatchers(HttpMethod.PUT,    "/api/v1/viajeros/**").hasAnyRole("SUPERVISOR", "OFICIAL")
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/viajeros/**").hasAnyRole("SUPERVISOR", "OFICIAL")
+                        // ── Viajeros ─────────────────────────────────────────────────
+                        .requestMatchers(HttpMethod.GET,    "/api/v1/viajeros/**").hasAnyRole("SUPERVISOR", "OFICIAL", "INSPECTOR", "VIAJERO")
+                        .requestMatchers(HttpMethod.POST,   "/api/v1/viajeros/**").hasAnyRole("SUPERVISOR", "OFICIAL", "VIAJERO")
+                        .requestMatchers(HttpMethod.PUT,    "/api/v1/viajeros/**").hasAnyRole("SUPERVISOR", "OFICIAL")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/viajeros/**").hasAnyRole("SUPERVISOR", "OFICIAL")
 
-                .requestMatchers(HttpMethod.GET,    "/api/v1/vehiculos/**").hasAnyRole("SUPERVISOR", "OFICIAL", "INSPECTOR", "VIAJERO")
-                .requestMatchers(HttpMethod.POST,   "/api/v1/vehiculos/**").hasAnyRole("SUPERVISOR", "OFICIAL", "VIAJERO")
-                .requestMatchers(HttpMethod.PUT,    "/api/v1/vehiculos/**").hasAnyRole("SUPERVISOR", "OFICIAL")
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/vehiculos/**").hasAnyRole("SUPERVISOR", "OFICIAL")
+                        // ── Vehiculos (incluye TRANSPORTISTA — regla unica, sin duplicados) ──
+                        .requestMatchers(HttpMethod.GET,    "/api/v1/vehiculos/**").hasAnyRole("SUPERVISOR", "OFICIAL", "INSPECTOR", "VIAJERO", "TRANSPORTISTA")
+                        .requestMatchers(HttpMethod.POST,   "/api/v1/vehiculos/**").hasAnyRole("SUPERVISOR", "OFICIAL", "VIAJERO", "TRANSPORTISTA")
+                        .requestMatchers(HttpMethod.PUT,    "/api/v1/vehiculos/**").hasAnyRole("SUPERVISOR", "OFICIAL", "TRANSPORTISTA")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/vehiculos/**").hasAnyRole("SUPERVISOR", "OFICIAL")
 
-                .requestMatchers(HttpMethod.GET,    "/api/v1/movimientos/**").hasAnyRole("SUPERVISOR", "OFICIAL", "INSPECTOR", "VIAJERO")
-                .requestMatchers(HttpMethod.POST,   "/api/v1/movimientos/**").hasAnyRole("SUPERVISOR", "OFICIAL")
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/movimientos/**").hasAnyRole("SUPERVISOR", "OFICIAL")
+                        // ── Movimientos (incluye TRANSPORTISTA en GET — regla unica) ────
+                        .requestMatchers(HttpMethod.GET,    "/api/v1/movimientos/**").hasAnyRole("SUPERVISOR", "OFICIAL", "INSPECTOR", "VIAJERO", "TRANSPORTISTA")
+                        .requestMatchers(HttpMethod.POST,   "/api/v1/movimientos/**").hasAnyRole("SUPERVISOR", "OFICIAL")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/movimientos/**").hasAnyRole("SUPERVISOR", "OFICIAL")
 
-                .requestMatchers("/api/v1/sag/**").hasAnyRole("SUPERVISOR", "OFICIAL")
-                .requestMatchers("/api/v1/pdi/**").hasAnyRole("SUPERVISOR", "OFICIAL")
-                .requestMatchers("/api/v1/viajeros/menores/**").hasAnyRole("SUPERVISOR", "OFICIAL")
+                        .requestMatchers("/api/v1/sag/**").hasAnyRole("SUPERVISOR", "OFICIAL")
+                        .requestMatchers("/api/v1/pdi/**").hasAnyRole("SUPERVISOR", "OFICIAL")
+                        .requestMatchers("/api/v1/aduana/**").hasAnyRole("SUPERVISOR", "OFICIAL", "INSPECTOR", "VIAJERO")
+                        .requestMatchers("/api/v1/viajeros/menores/**").hasAnyRole("SUPERVISOR", "OFICIAL")
 
-<<<<<<< HEAD
-                .requestMatchers(HttpMethod.GET,    "/api/v1/vehiculos/**").hasAnyRole("SUPERVISOR", "OFICIAL", "INSPECTOR", "VIAJERO", "TRANSPORTISTA")
-                .requestMatchers(HttpMethod.POST,   "/api/v1/vehiculos/**").hasAnyRole("SUPERVISOR", "OFICIAL", "VIAJERO", "TRANSPORTISTA")
-                .requestMatchers(HttpMethod.PUT,    "/api/v1/vehiculos/**").hasAnyRole("SUPERVISOR", "OFICIAL", "TRANSPORTISTA")
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/vehiculos/**").hasAnyRole("SUPERVISOR", "OFICIAL")
-
-                .requestMatchers(HttpMethod.GET,    "/api/v1/movimientos/**").hasAnyRole("SUPERVISOR", "OFICIAL", "INSPECTOR", "VIAJERO", "TRANSPORTISTA")
-
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
-                .anyRequest().authenticated()
-            )
-            .exceptionHandling(ex -> ex
-                .authenticationEntryPoint(unauthorizedEntryPoint())
-                .accessDeniedHandler((req, res, e) -> res.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden"))
-            )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(unauthorizedEntryPoint())
+                        .accessDeniedHandler((req, res, e) -> res.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden"))
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

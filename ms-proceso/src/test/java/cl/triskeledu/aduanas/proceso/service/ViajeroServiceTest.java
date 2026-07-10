@@ -16,29 +16,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-<<<<<<< HEAD
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-<<<<<<< HEAD
 import static org.junit.jupiter.api.Assertions.assertThrows;
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-<<<<<<< HEAD
 @MockitoSettings(strictness = Strictness.LENIENT)
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 @DisplayName("ViajeroService - Pruebas Unitarias")
 class ViajeroServiceTest {
 
@@ -166,7 +157,6 @@ class ViajeroServiceTest {
     @DisplayName("crear - lanza DuplicateResourceException si rut ya existe")
     @SuppressWarnings("null")
     void crear_rutDuplicado_lanzaExcepcion() {
-<<<<<<< HEAD
         // 1. Crear el request que envía el usuario
         ViajeroRequest request = new ViajeroRequest();
         request.setRut("12345678-9");
@@ -184,15 +174,6 @@ class ViajeroServiceTest {
         assertThrows(DuplicateResourceException.class, () -> {
             viajeroService.crear(request);
         });
-=======
-        when(viajeroRepository.existsByRut("12345678-9")).thenReturn(true);
-
-        assertThatThrownBy(() -> viajeroService.crear(viajeroRequest))
-                .isInstanceOf(DuplicateResourceException.class)
-                .hasMessageContaining("12345678-9");
-
-        verify(viajeroRepository, never()).save(any());
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
     }
 
     @Test

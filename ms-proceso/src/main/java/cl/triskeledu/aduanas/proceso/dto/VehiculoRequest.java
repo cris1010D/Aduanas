@@ -17,7 +17,6 @@ public class VehiculoRequest {
     @Size(max = 80, message = "El propietario no puede superar 80 caracteres")
     private String propietario;
 
-<<<<<<< HEAD
     private LocalDate fechaIngreso;
     private LocalDate fechaVencimiento;
 
@@ -44,9 +43,3 @@ public class VehiculoRequest {
 
     private Integer anio;
 }
-=======
-    // El sistema calcula estas fechas automáticamente (hoy + 180 días)
-    private LocalDate fechaIngreso;
-    private LocalDate fechaVencimiento;
-}
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7

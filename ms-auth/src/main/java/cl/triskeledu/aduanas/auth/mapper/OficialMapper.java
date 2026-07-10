@@ -17,9 +17,11 @@ public interface OficialMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true)
+    @Mapping(target = "empresa", ignore = true)
     Oficial toEntity(OficialCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true)
+    @Mapping(target = "empresa", ignore = true)
     void updateEntity(OficialUpdateRequest request, @MappingTarget Oficial oficial);
 }

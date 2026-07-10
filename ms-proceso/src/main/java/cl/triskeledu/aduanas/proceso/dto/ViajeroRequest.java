@@ -1,18 +1,12 @@
 package cl.triskeledu.aduanas.proceso.dto;
 
-<<<<<<< HEAD
 import jakarta.validation.constraints.Email;
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-<<<<<<< HEAD
 import java.time.LocalDate;
 
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class ViajeroRequest {
 
@@ -30,7 +24,6 @@ public class ViajeroRequest {
     @NotBlank(message = "La nacionalidad es obligatoria")
     @Size(max = 40, message = "La nacionalidad no puede superar 40 caracteres")
     private String nacionalidad;
-<<<<<<< HEAD
 
     // ── Documento de viaje ───────────────────────────────────────────────
     @Size(max = 20, message = "Tipo de documento invalido")
@@ -74,6 +67,3 @@ public class ViajeroRequest {
     @Size(max = 80)
     private String seguroProveedor;
 }
-=======
-}
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7

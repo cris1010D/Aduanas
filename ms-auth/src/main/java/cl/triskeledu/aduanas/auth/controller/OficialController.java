@@ -1,7 +1,5 @@
 package cl.triskeledu.aduanas.auth.controller;
 
-import cl.triskeledu.aduanas.auth.dto.LoginRequest;
-import cl.triskeledu.aduanas.auth.dto.LoginResponse;
 import cl.triskeledu.aduanas.auth.dto.OficialCreateRequest;
 import cl.triskeledu.aduanas.auth.dto.OficialResponse;
 import cl.triskeledu.aduanas.auth.dto.OficialUpdateRequest;
@@ -30,19 +28,15 @@ public class OficialController {
 
     private final OficialService oficialService;
 
-    @Operation(summary = "Autenticar oficial y obtener token JWT")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Autenticacion exitosa - retorna JWT"),
-        @ApiResponse(responseCode = "401", description = "RUT o password incorrecto")
-    })
-    @PostMapping("/auth/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        return ResponseEntity.ok(oficialService.login(request));
-    }
+    // NOTA: se eliminó el endpoint duplicado "POST /api/v1/oficiales/auth/login"
+    // que existía aquí. Era inservible: caía bajo la regla de seguridad
+    // "POST /api/v1/oficiales/** -> hasRole(SUPERVISOR)", es decir, exigía estar
+    // logueado como SUPERVISOR para poder... loguearse. El login real y funcional
+    // sigue siendo POST /api/v1/auth/login (AuthController), que es permitAll.
 
     @Operation(summary = "Listar todos los oficiales")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Lista obtenida correctamente")
+            @ApiResponse(responseCode = "200", description = "Lista obtenida correctamente")
     })
     @GetMapping
     @SuppressWarnings("null")
@@ -58,7 +52,7 @@ public class OficialController {
 
     @Operation(summary = "Listar oficiales activos")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Lista de oficiales activos")
+            @ApiResponse(responseCode = "200", description = "Lista de oficiales activos")
     })
     @GetMapping("/activos")
     @SuppressWarnings("null")
@@ -72,10 +66,26 @@ public class OficialController {
                 linkTo(methodOn(OficialController.class).listarActivos()).withSelfRel()));
     }
 
+    @Operation(summary = "Listar usuarios por rol (ej: TRANSPORTISTA, VIAJERO, OFICIAL)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de usuarios con el rol indicado")
+    })
+    @GetMapping("/rol/{rol}")
+    @SuppressWarnings("null")
+    public ResponseEntity<CollectionModel<EntityModel<OficialResponse>>> listarPorRol(@PathVariable String rol) {
+        List<EntityModel<OficialResponse>> items = oficialService.listarPorRol(rol.toUpperCase()).stream()
+                .map(o -> EntityModel.of(o,
+                        linkTo(methodOn(OficialController.class).buscarPorId(o.getId())).withSelfRel(),
+                        linkTo(methodOn(OficialController.class).listarTodos()).withRel("collection")))
+                .toList();
+        return ResponseEntity.ok(CollectionModel.of(items,
+                linkTo(methodOn(OficialController.class).listarPorRol(rol)).withSelfRel()));
+    }
+
     @Operation(summary = "Buscar oficial por ID")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Oficial encontrado"),
-        @ApiResponse(responseCode = "404", description = "Oficial no encontrado")
+            @ApiResponse(responseCode = "200", description = "Oficial encontrado"),
+            @ApiResponse(responseCode = "404", description = "Oficial no encontrado")
     })
     @GetMapping("/{id}")
     @SuppressWarnings("null")
@@ -89,8 +99,8 @@ public class OficialController {
 
     @Operation(summary = "Buscar oficial por RUT")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Oficial encontrado"),
-        @ApiResponse(responseCode = "404", description = "Oficial no encontrado")
+            @ApiResponse(responseCode = "200", description = "Oficial encontrado"),
+            @ApiResponse(responseCode = "404", description = "Oficial no encontrado")
     })
     @GetMapping("/rut/{rut}")
     @SuppressWarnings("null")
@@ -103,9 +113,9 @@ public class OficialController {
 
     @Operation(summary = "Registrar nuevo oficial")
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Oficial registrado correctamente"),
-        @ApiResponse(responseCode = "400", description = "Datos invalidos"),
-        @ApiResponse(responseCode = "409", description = "Ya existe un oficial con ese RUT")
+            @ApiResponse(responseCode = "201", description = "Oficial registrado correctamente"),
+            @ApiResponse(responseCode = "400", description = "Datos invalidos"),
+            @ApiResponse(responseCode = "409", description = "Ya existe un oficial con ese RUT")
     })
     @PostMapping
     @SuppressWarnings("null")
@@ -118,14 +128,14 @@ public class OficialController {
 
     @Operation(summary = "Actualizar datos de oficial")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Oficial actualizado correctamente"),
-        @ApiResponse(responseCode = "404", description = "Oficial no encontrado"),
-        @ApiResponse(responseCode = "400", description = "Datos invalidos")
+            @ApiResponse(responseCode = "200", description = "Oficial actualizado correctamente"),
+            @ApiResponse(responseCode = "404", description = "Oficial no encontrado"),
+            @ApiResponse(responseCode = "400", description = "Datos invalidos")
     })
     @PutMapping("/{id}")
     @SuppressWarnings("null")
     public ResponseEntity<EntityModel<OficialResponse>> actualizar(@PathVariable Integer id,
-                                                                    @Valid @RequestBody OficialUpdateRequest request) {
+                                                                   @Valid @RequestBody OficialUpdateRequest request) {
         OficialResponse response = oficialService.actualizar(id, request);
         return ResponseEntity.ok(EntityModel.of(response,
                 linkTo(methodOn(OficialController.class).buscarPorId(id)).withSelfRel(),
@@ -134,8 +144,8 @@ public class OficialController {
 
     @Operation(summary = "Eliminar oficial")
     @ApiResponses({
-        @ApiResponse(responseCode = "204", description = "Oficial eliminado correctamente"),
-        @ApiResponse(responseCode = "404", description = "Oficial no encontrado")
+            @ApiResponse(responseCode = "204", description = "Oficial eliminado correctamente"),
+            @ApiResponse(responseCode = "404", description = "Oficial no encontrado")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Integer id) {

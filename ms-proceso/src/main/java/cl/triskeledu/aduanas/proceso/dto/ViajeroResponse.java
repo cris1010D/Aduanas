@@ -3,11 +3,8 @@ package cl.triskeledu.aduanas.proceso.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
-<<<<<<< HEAD
 import java.time.LocalDate;
 
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ViajeroResponse {
@@ -17,7 +14,6 @@ public class ViajeroResponse {
     private String nombre;
     private String pasaporte;
     private String nacionalidad;
-<<<<<<< HEAD
 
     private String tipoDocumento;
     private String paisEmisorDocumento;
@@ -37,6 +33,3 @@ public class ViajeroResponse {
     private Boolean seguroVigente;
     private String seguroProveedor;
 }
-=======
-}
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7

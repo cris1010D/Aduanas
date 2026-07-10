@@ -15,11 +15,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-<<<<<<< HEAD
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,10 +27,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-<<<<<<< HEAD
 @MockitoSettings(strictness = Strictness.LENIENT)
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 @DisplayName("MenorService - Pruebas Unitarias")
 class MenorServiceTest {
 
@@ -163,7 +157,6 @@ class MenorServiceTest {
     @Test
     @DisplayName("crear menor con RUT duplicado lanza DuplicateResourceException")
     void crear_rutDuplicado_lanzaExcepcion() {
-<<<<<<< HEAD
         // 1. Instanciar el menor existente que causará el duplicado
         Menor menorExistente = new Menor();
         menorExistente.setRut("11111111-1");
@@ -174,22 +167,11 @@ class MenorServiceTest {
                 .thenReturn(Optional.of(menorExistente));
 
         // 3. Validar el lanzamiento de la excepción
-=======
-        when(menorRepository.existsByRut("11111111-1")).thenReturn(true);
-
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
         assertThatThrownBy(() -> menorService.crear(menorRequest))
                 .isInstanceOf(DuplicateResourceException.class)
                 .hasMessageContaining("11111111-1");
     }
 
-<<<<<<< HEAD
-=======
-    // -------------------------------------------------------
-    // ACTUALIZAR
-    // -------------------------------------------------------
-
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
     @Test
     @DisplayName("actualizar menor existente retorna response actualizado")
     @SuppressWarnings("null")

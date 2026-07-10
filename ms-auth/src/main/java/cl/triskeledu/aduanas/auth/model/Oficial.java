@@ -27,4 +27,9 @@ public class Oficial {
     // Campo agregado para almacenar la contraseña cifrada (hash BCrypt)
     @Column(nullable = false, length = 255)
     private String password;
+
+    // Empresa transportista. Solo aplica a usuarios con rol TRANSPORTISTA;
+    // queda en null para SUPERVISOR/OFICIAL/INSPECTOR/VIAJERO.
+    @Column(length = 100)
+    private String empresa;
 }

@@ -12,9 +12,6 @@ public interface VehiculoRepository extends JpaRepository<Vehiculo, Integer> {
     Optional<Vehiculo> findByPlaca(String placa);
     boolean existsByPlaca(String placa);
     List<Vehiculo> findAllByOrderByIdAsc();
-<<<<<<< HEAD
 
     List<Vehiculo> findByRutPropietario(String rutPropietario);
-=======
->>>>>>> ea01fb5f3b7f052c39b23f480a9f45e8e152cad7
 }

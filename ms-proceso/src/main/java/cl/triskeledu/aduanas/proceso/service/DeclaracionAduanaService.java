@@ -49,6 +49,7 @@ public class DeclaracionAduanaService {
         return declaracionAduanaMapper.toResponseList(declaracionAduanaRepository.findByRutViajero(rutViajero));
     }
 
+    @SuppressWarnings("null")
     public DeclaracionAduanaResponse buscarPorId(Integer id) {
         return declaracionAduanaMapper.toResponse(
                 declaracionAduanaRepository.findById(id)
@@ -57,6 +58,7 @@ public class DeclaracionAduanaService {
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public DeclaracionAduanaResponse tramitar(DeclaracionAduanaRequest request) {
         log.info("Tramitando declaracion de aduana. Viajero: {} | Paso: {}",
                 request.getRutViajero(), request.getPasoFronterizo());
